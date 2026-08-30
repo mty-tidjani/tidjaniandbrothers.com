@@ -37,6 +37,11 @@ yarn-error.log*
 # local file uploads (see .env.example / README for production storage notes)
 /public/uploads/*
 !/public/uploads/.gitkeep
+# seed fixture images (downloaded from the Stitch mockups, referenced by prisma/seed.ts)
+!/public/uploads/blog/
+!/public/uploads/about/
+!/public/uploads/case-studies/
+!/public/uploads/services/
 
 # vercel
 .vercel

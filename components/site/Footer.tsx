@@ -76,7 +76,7 @@ export function Footer({ phone, email, address, facebookUrl }: FooterProps) {
 
       <div className="container-max mt-stack-lg border-glass-stroke/50 px-margin-mobile md:px-gutter border-t pt-8">
         <p className="text-on-surface-variant text-sm">
-          © {new Date().getFullYear()} Spartiat-AI. Tous droits réservés.
+          © {new Date().getFullYear()} Spartiat AI is a trade name of <span className="text-body-lg text-primary">Tidjani & Brothers SARL</span>.
         </p>
       </div>
     </footer>

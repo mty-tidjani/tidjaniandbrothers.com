@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { GraduationCap, HeartHandshake } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -13,18 +14,21 @@ const TIMELINE = [
     title: "Fondation à Yaoundé",
     description:
       "Spartiat-AI démarre comme agence de web design (alors Spartiat-IT), au service des entreprises locales.",
+    image: "/uploads/about/2019-fondation-yaounde.jpg",
   },
   {
     year: "2023",
     title: "Le virage Odoo",
     description:
       "Face au besoin réel du terrain, l'équipe se spécialise dans l'implémentation et la maintenance Odoo ERP.",
+    image: "/uploads/about/2023-virage-odoo.jpg",
   },
   {
     year: "2026",
     title: "Naissance de Spartiat-AI",
     description:
       "Rebranding et recentrage sur l'ERP pour PME locales, avec une approche bilingue et une vraie proximité client.",
+    image: "/uploads/about/2026-naissance-spartiat-ai.jpg",
   },
 ];
 
@@ -45,17 +49,34 @@ export default function AboutPage() {
 
       <section className="container-max px-margin-mobile pb-section-gap-desktop md:px-gutter">
         <div className="space-y-stack-lg">
-          {TIMELINE.map((item) => (
+          {TIMELINE.map((item, index) => (
             <div
               key={item.year}
-              className="border-glass-stroke grid grid-cols-1 gap-4 border-l-2 py-2 pl-6 md:grid-cols-[120px_1fr]"
+              className="border-glass-stroke grid grid-cols-1 items-center gap-6 border-l-2 py-2 pl-6 md:grid-cols-2"
             >
-              <span className="text-headline-sm text-primary">{item.year}</span>
-              <div>
+              <div className={index % 2 === 1 ? "md:order-2" : undefined}>
+                <span className="text-headline-sm text-primary mb-2 block">
+                  {item.year}
+                </span>
                 <h2 className="text-headline-sm text-on-surface mb-2">
                   {item.title}
                 </h2>
                 <p className="text-on-surface-variant">{item.description}</p>
+              </div>
+              <div
+                className={
+                  index % 2 === 1
+                    ? "border-glass-stroke relative hidden aspect-video overflow-hidden rounded-lg border md:order-1 md:block"
+                    : "border-glass-stroke relative hidden aspect-video overflow-hidden rounded-lg border md:block"
+                }
+              >
+                <Image
+                  src={item.image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 40vw, 100vw"
+                  className="object-cover"
+                />
               </div>
             </div>
           ))}

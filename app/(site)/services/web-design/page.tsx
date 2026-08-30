@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { ShoppingCart, Store, GalleryHorizontal, Code2 } from "lucide-react";
 import { CTASection } from "@/components/site/CTASection";
 import { getCompanySettings } from "@/lib/data/settings";
@@ -42,14 +43,28 @@ export default async function WebDesignServicesPage() {
   return (
     <>
       <section className="container-max px-margin-mobile pb-section-gap-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
-        <h1 className="text-display mb-stack-md text-on-surface">
-          Web design, <span className="text-primary">unifié avec Odoo</span>
-        </h1>
-        <p className="text-body-lg text-on-surface-variant max-w-2xl">
-          Nous gérons votre projet web aux côtés de votre déploiement Odoo, avec
-          une seule équipe et un seul point de contact — vos données restent
-          cohérentes du site jusqu&rsquo;à la comptabilité.
-        </p>
+        <div className="gap-gutter grid grid-cols-1 items-center md:grid-cols-2">
+          <div>
+            <h1 className="text-display mb-stack-md text-on-surface">
+              Web design, <span className="text-primary">unifié avec Odoo</span>
+            </h1>
+            <p className="text-body-lg text-on-surface-variant max-w-2xl">
+              Nous gérons votre projet web aux côtés de votre déploiement Odoo,
+              avec une seule équipe et un seul point de contact — vos données
+              restent cohérentes du site jusqu&rsquo;à la comptabilité.
+            </p>
+          </div>
+          <div className="border-glass-stroke relative hidden aspect-video overflow-hidden rounded-2xl border md:block">
+            <Image
+              src="/uploads/services/web-design-hero.jpg"
+              alt=""
+              fill
+              sizes="40vw"
+              className="object-cover"
+              priority
+            />
+          </div>
+        </div>
       </section>
 
       <section className="container-max px-margin-mobile pb-section-gap-mobile md:px-gutter md:pb-section-gap-desktop">

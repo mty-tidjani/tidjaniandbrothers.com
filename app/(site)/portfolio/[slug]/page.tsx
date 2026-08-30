@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CTASection } from "@/components/site/CTASection";
@@ -42,6 +43,19 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
         <h1 className="text-display mb-stack-lg text-on-surface">
           {study.sector}
         </h1>
+
+        {study.imagePaths[0] ? (
+          <div className="border-glass-stroke mb-stack-lg relative aspect-video w-full overflow-hidden rounded-2xl border">
+            <Image
+              src={study.imagePaths[0]}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 1024px, 100vw"
+              className="object-cover"
+              priority
+            />
+          </div>
+        ) : null}
 
         <div className="gap-gutter grid grid-cols-1 md:grid-cols-2">
           <div className="glass-card border-error/50 rounded-xl border-l-4 p-8">

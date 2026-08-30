@@ -170,6 +170,7 @@ export default async function HomePage() {
               sector={featuredCaseStudy.sector}
               before={featuredCaseStudy.before}
               after={featuredCaseStudy.after}
+              imagePath={featuredCaseStudy.imagePaths[0]}
               featured
             />
           </div>

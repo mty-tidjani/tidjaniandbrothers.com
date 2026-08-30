@@ -111,7 +111,9 @@ async function main() {
 
   await prisma.caseStudy.upsert({
     where: { slug: "commerce-detail-yaounde" },
-    update: {},
+    update: {
+      imagePaths: ["/uploads/case-studies/commerce-detail-yaounde.jpg"],
+    },
     create: {
       slug: "commerce-detail-yaounde",
       sector: "Commerce de détail, Yaoundé",
@@ -120,7 +122,7 @@ async function main() {
       after:
         "Installation d'Odoo (Facturation + Stock + Ventes) : traitement des factures le jour même au lieu de 2 jours, visibilité en temps réel sur le stock, formation de 4 membres de l'équipe.",
       resultMetric: "Facturation : 2 jours → le jour même",
-      imagePaths: [],
+      imagePaths: ["/uploads/case-studies/commerce-detail-yaounde.jpg"],
       published: true,
     },
   });
@@ -154,6 +156,7 @@ async function main() {
     excerpt: string;
     contentHtml: string;
     category: "ODOO" | "DIGITALISATION" | "ACTUALITES";
+    coverImagePath: string;
   }> = [
     {
       title: "3 signes que votre entreprise a dépassé Excel",
@@ -163,6 +166,7 @@ async function main() {
       contentHtml:
         "<p>Les feuilles de calcul sont excellentes pour démarrer, mais deviennent un frein à mesure que votre activité grandit. Trois signes ne trompent pas : du temps perdu à chercher une facture, une visibilité nulle sur les stocks réels, et des chiffres qui ne correspondent jamais d'un fichier à l'autre.</p>",
       category: "DIGITALISATION",
+      coverImagePath: "/uploads/blog/depasse-excel.jpg",
     },
     {
       title:
@@ -173,6 +177,7 @@ async function main() {
       contentHtml:
         "<p>Odoo est une plateforme puissante, mais son intégration réussie dépend d'une chose : bien cadrer les besoins réels de l'entreprise avant de configurer quoi que ce soit. C'est l'approche que nous appliquons à chaque projet.</p>",
       category: "ODOO",
+      coverImagePath: "/uploads/blog/pourquoi-odoo.jpg",
     },
     {
       title:
@@ -183,6 +188,7 @@ async function main() {
       contentHtml:
         "<p>Acheter des logiciels n'est pas se digitaliser. Beaucoup d'entreprises accumulent des outils déconnectés qui ne communiquent pas entre eux, ce qui aggrave le problème qu'ils étaient censés résoudre.</p>",
       category: "DIGITALISATION",
+      coverImagePath: "/uploads/blog/piege-numerique.jpg",
     },
     {
       title:
@@ -190,9 +196,30 @@ async function main() {
       slug: "odoo-community-vs-enterprise",
       excerpt:
         "Démêler le vrai du faux. Quelle version est réellement adaptée à l'échelle de votre PME africaine ?",
-      contentHtml:
-        "<p>Odoo Community offre une base solide, mais la version Enterprise devient rapidement rentable dès que la comptabilité avancée, le support mobile et l'assistance officielle deviennent critiques pour l'activité.</p>",
+      contentHtml: `<p>La digitalisation n'est plus une option pour les PME en Afrique Centrale, c'est une question de survie et de compétitivité. Face au marché des ERP, Odoo s'impose comme un acteur majeur grâce à sa flexibilité et son modèle open-source. Cependant, une question revient systématiquement lors de nos consultations : <strong>faut-il opter pour la version Community (gratuite) ou investir dans la version Enterprise ?</strong></p>
+<p>Chez Spartiat-AI, nous croyons en une approche chirurgicale de la technologie. Voici une analyse sans concession pour vous aider à trancher.</p>
+<h2>L'illusion de la gratuité : le cas Community</h2>
+<p>Odoo Community est une base solide. Elle offre un accès au code source et permet de déployer des modules fondamentaux (CRM, Ventes, Facturation de base). C'est souvent le point d'entrée idéal pour une TPE ou un développeur indépendant souhaitant tester l'écosystème.</p>
+<blockquote><p>Le coût réel d'un logiciel gratuit se mesure en heures de maintenance, en compromis fonctionnels et en dette technique.</p></blockquote>
+<p>Cependant, les limites apparaissent rapidement lorsque l'entreprise cherche à <em>scaler</em>. La version Community est amputée de fonctionnalités critiques :</p>
+<ul>
+<li><strong>Comptabilité avancée :</strong> absence de lettrage automatisé, de gestion multi-devises complète et de rapports dynamiques.</li>
+<li><strong>Interface mobile :</strong> l'interface n'est pas optimisée (responsive) pour les smartphones, un frein majeur sur le continent.</li>
+<li><strong>Hébergement et support :</strong> vous êtes seul responsable de l'infrastructure, de la sécurité et des mises à jour.</li>
+</ul>
+<h2>La force de frappe Enterprise</h2>
+<p>Odoo Enterprise est l'armure complète. Elle transforme le framework en une machine prête à l'emploi. Le coût de la licence est largement compensé par le gain de productivité et la sécurité opérationnelle.</p>
+<h3>Les avantages décisifs de l'Enterprise</h3>
+<ul>
+<li><strong>Odoo Studio :</strong> personnalisation de l'interface et création d'applications sans coder (no-code).</li>
+<li><strong>Modules exclusifs :</strong> qualité, code-barres pour la logistique, automatisation du marketing, et applications bancaires complètes.</li>
+<li><strong>Migration garantie :</strong> Odoo s'engage à migrer votre base de données vers les nouvelles versions, sécurisant ainsi votre investissement sur le long terme.</li>
+</ul>
+<h2>Le verdict Spartiate</h2>
+<p>Si votre chiffre d'affaires dépend de la robustesse de votre système d'information, la version Community est un risque. Le temps passé par vos équipes à contourner ses limitations ou à développer des modules sur-mesure vous coûtera infiniment plus cher que la licence Enterprise.</p>
+<p>Notre mission chez Spartiat-AI est de déployer des systèmes qui accélèrent votre croissance, pas qui la freinent. C'est pourquoi nous recommandons et intégrons exclusivement <strong>Odoo Enterprise</strong>, calibré sur-mesure pour les réalités de votre secteur.</p>`,
       category: "ODOO",
+      coverImagePath: "/uploads/blog/community-vs-enterprise.jpg",
     },
     {
       title:
@@ -203,13 +230,14 @@ async function main() {
       contentHtml:
         "<p>Le paiement mobile est incontournable au Cameroun. Une intégration correcte avec Odoo permet de rapprocher automatiquement les transactions MTN Mobile Money et Orange Money avec votre comptabilité, sans ressaisie manuelle.</p>",
       category: "ODOO",
+      coverImagePath: "/uploads/blog/paiement-mobile.jpg",
     },
   ];
 
   for (const post of blogPosts) {
     await prisma.blogPost.upsert({
       where: { slug: post.slug },
-      update: {},
+      update: post,
       create: {
         ...post,
         status: "PUBLISHED",

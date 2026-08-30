@@ -36,6 +36,7 @@ export default async function BlogPage() {
               excerpt={post.excerpt}
               category={post.category}
               publishedAt={post.publishedAt}
+              coverImagePath={post.coverImagePath}
               featured={index === 0}
             />
           ))}

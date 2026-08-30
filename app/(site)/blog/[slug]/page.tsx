@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -51,6 +52,19 @@ export default async function BlogPostPage({ params }: PageProps) {
           </span>
         </div>
       </header>
+
+      {post.coverImagePath ? (
+        <div className="border-glass-stroke mb-section-gap-mobile relative aspect-video max-w-3xl overflow-hidden rounded-2xl border">
+          <Image
+            src={post.coverImagePath}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 768px, 100vw"
+            className="object-cover"
+            priority
+          />
+        </div>
+      ) : null}
 
       {/* contentHtml is authored exclusively by authenticated admin/editor accounts
           via the Tiptap editor — not arbitrary visitor input. */}

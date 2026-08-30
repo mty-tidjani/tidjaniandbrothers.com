@@ -35,6 +35,7 @@ export default async function PortfolioPage() {
               sector={study.sector}
               before={study.before}
               after={study.after}
+              imagePath={study.imagePaths[0]}
               featured={index === 0}
             />
           ))}
