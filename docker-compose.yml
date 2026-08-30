@@ -1,15 +1,25 @@
 services:
-  db:
-    image: postgres:16-alpine
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spartiat_app
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: spartiat
-      POSTGRES_PASSWORD: spartiat
-      POSTGRES_DB: spartiat_ai
+      # Reach the db by its service name on spartiat_net instead of the
+      # host-facing localhost URL in .env.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-spartiat}:${POSTGRES_PASSWORD:-spartiat}@db:5432/${POSTGRES_DB:-spartiat_ai}
     ports:
-      - "5432:5432"
-    volumes:
-      - spartiat_postgres_data:/var/lib/postgresql/data
+      - "4141:3000"
+    networks:
+      - spartiat_net
 
-volumes:
-  spartiat_postgres_data:
+# spartiat_net is created by the db project's docker-compose.yml; this file
+# only joins it (external: true) rather than declaring it, so `db:5432` on
+# that network resolves to the already-running spartiat_db container.
+networks:
+  spartiat_net:
+    name: spartiat_net
+    external: true
