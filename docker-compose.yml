@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: spartiat
+      POSTGRES_PASSWORD: spartiat
+      POSTGRES_DB: spartiat_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - spartiat_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  spartiat_postgres_data:
