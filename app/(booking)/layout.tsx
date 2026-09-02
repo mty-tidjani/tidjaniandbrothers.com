@@ -15,7 +15,7 @@ export default function BookingLayout({
           href="/"
           className="text-headline-sm text-primary font-bold tracking-tighter"
         >
-          Spartiat-AI
+          Tidjani & Brothers
         </Link>
         <div className="flex items-center gap-4">
           <ThemeToggle />

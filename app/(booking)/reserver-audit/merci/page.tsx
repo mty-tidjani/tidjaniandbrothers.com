@@ -25,7 +25,7 @@ export default async function AuditConfirmationPage({
         Merci&nbsp;! Votre demande a bien été reçue 🎉
       </h1>
       <p className="mb-section-gap-mobile text-body-lg text-on-surface-variant">
-        Un membre de l&rsquo;équipe Spartiat-AI vous contactera sous 24h ouvrées
+        Un membre de l&rsquo;équipe Tidjani & Brothers vous contactera sous 24h ouvrées
         {phone ? (
           <>
             {" "}

@@ -5,15 +5,15 @@ import { GraduationCap, HeartHandshake } from "lucide-react";
 export const metadata: Metadata = {
   title: "À propos",
   description:
-    "Fondée en 2019 à Yaoundé, Spartiat-AI a évolué du web design vers l'implémentation Odoo ERP pour PME camerounaises. We make IT for you.",
+    "Fondée en 2021 à Yaoundé, Tidjani & Brothers a évolué du web design vers l'implémentation Odoo ERP pour PME camerounaises. We build IT for you.",
 };
 
 const TIMELINE = [
   {
-    year: "2019",
-    title: "Fondation à Yaoundé",
+    year: "2021",
+    title: "Fondation à Douala",
     description:
-      "Spartiat-AI démarre comme agence de web design (alors Spartiat-IT), au service des entreprises locales.",
+      "Tidjani & Brothers démarre comme agence de web design base a Yaoundé, au service des entreprises locales.",
     image: "/uploads/about/2019-fondation-yaounde.jpg",
   },
   {
@@ -25,10 +25,10 @@ const TIMELINE = [
   },
   {
     year: "2026",
-    title: "Naissance de Spartiat-AI",
+    title: "Naissance de Tidjani & Brothers",
     description:
       "Rebranding et recentrage sur l'ERP pour PME locales, avec une approche bilingue et une vraie proximité client.",
-    image: "/uploads/about/2026-naissance-spartiat-ai.jpg",
+    image: "/uploads/about/2026-naissance-ai.jpg",
   },
 ];
 

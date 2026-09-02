@@ -81,8 +81,8 @@ export const ROLE_LABELS: Record<string, string> = {
 
 export const COMPANY_PHONE = "+237 6 98 96 67 19";
 export const COMPANY_PHONE_TEL = "tel:+237698966719";
-export const COMPANY_EMAIL = "contact@spartiat-it.com";
-export const COMPANY_EMAIL_MAILTO = "mailto:contact@spartiat-it.com";
+export const COMPANY_EMAIL = "contact@tidjaniandbrothers.com";
+export const COMPANY_EMAIL_MAILTO = "mailto:contact@tidjaniandbrothers.com";
 export const COMPANY_ADDRESS =
   "Awaye — près du Collège Père Monti, Yaoundé, Cameroun";
 export const COMPANY_FACEBOOK_URL = "https://www.facebook.com";

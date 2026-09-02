@@ -21,7 +21,7 @@ export function Navbar() {
           href="/"
           className="text-headline-sm text-primary font-bold tracking-tighter"
         >
-          Spartiat-AI
+          Tidjani & Brothers
         </Link>
 
         <nav

@@ -17,11 +17,11 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: "Spartiat-AI | We make IT for you",
-    template: "%s | Spartiat-AI",
+    default: "Tidjani & Brothers | We make IT for you",
+    template: "%s | Tidjani & Brothers",
   },
   description:
-    "Spartiat-AI accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money. Équipe locale à Yaoundé.",
+    "Tidjani & Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money. Équipe locale à Yaoundé.",
 };
 
 export default function RootLayout({

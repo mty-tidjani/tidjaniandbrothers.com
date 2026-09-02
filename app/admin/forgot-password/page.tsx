@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
       <div className="ambient-mesh" aria-hidden="true" />
       <div className="w-full max-w-md">
         <div className="mb-stack-lg text-center">
-          <h1 className="text-display text-primary mb-2">Spartiat-AI</h1>
+          <h1 className="text-display text-primary mb-2">Tidjani & Brothers</h1>
           <p className="text-body-lg text-on-surface-variant">Terminal Admin</p>
         </div>
 

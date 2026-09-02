@@ -7,7 +7,7 @@ import { getCompanySettings } from "@/lib/data/settings";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Contactez Spartiat-AI à Yaoundé pour votre projet Odoo ERP ou site web, ou réservez directement un audit gratuit de 30 minutes.",
+    "Contactez Tidjani & Brothers à Yaoundé pour votre projet Odoo ERP ou site web, ou réservez directement un audit gratuit de 30 minutes.",
 };
 
 export default async function ContactPage() {

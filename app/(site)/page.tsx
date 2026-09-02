@@ -13,7 +13,7 @@ import { getPublishedCaseStudies } from "@/lib/data/portfolio";
 export const metadata: Metadata = {
   title: "Accueil",
   description:
-    "Votre entreprise mérite mieux qu'Excel. Spartiat-AI déploie Odoo ERP sur-mesure pour les PME camerounaises : facturation, stock, ventes, comptabilité.",
+    "Votre entreprise mérite mieux qu'Excel. Tidjani & Brothers déploie Odoo ERP sur-mesure pour les PME camerounaises : facturation, stock, ventes, comptabilité.",
 };
 
 const PAIN_POINTS = [
@@ -179,7 +179,7 @@ export default async function HomePage() {
 
       <CTASection
         title="Prêt à moderniser votre gestion ?"
-        description="Un membre de l'équipe Spartiat-AI vous répond sous 24h ouvrées."
+        description="Un membre de l'équipe Tidjani & Brothers vous répond sous 24h ouvrées."
         phone={settings.phone}
         email={settings.email}
       />

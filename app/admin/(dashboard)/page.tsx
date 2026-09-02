@@ -29,7 +29,7 @@ export default async function AdminDashboardPage() {
       <header className="border-glass-stroke pb-stack-md border-b">
         <h1 className="text-headline-md text-on-surface">Tableau de bord</h1>
         <p className="text-on-surface-variant mt-1">
-          Bienvenue sur le terminal admin Spartiat-AI.
+          Bienvenue sur le terminal admin Tidjani & Brothers.
         </p>
       </header>
 

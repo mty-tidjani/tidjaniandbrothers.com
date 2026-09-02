@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@spartiat-it.com";
+  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@tidjaniandbrothers.com";
   const adminPassword = process.env.ADMIN_SEED_PASSWORD;
   if (!adminPassword) {
     throw new Error(
@@ -17,7 +17,7 @@ async function main() {
     where: { email: adminEmail },
     update: {},
     create: {
-      name: "Équipe Spartiat-AI",
+      name: "Équipe Tidjani & Brothers",
       email: adminEmail,
       passwordHash,
       role: "ADMIN",
@@ -30,7 +30,7 @@ async function main() {
     create: {
       id: "singleton",
       phone: "+237 6 98 96 67 19",
-      email: "contact@spartiat-it.com",
+      email: "contact@tidjaniandbrothers.com",
       address: "Awaye — près du Collège Père Monti, Yaoundé, Cameroun",
       facebookUrl: "https://www.facebook.com",
       defaultLocale: "fr",
@@ -197,7 +197,7 @@ async function main() {
       excerpt:
         "Démêler le vrai du faux. Quelle version est réellement adaptée à l'échelle de votre PME africaine ?",
       contentHtml: `<p>La digitalisation n'est plus une option pour les PME en Afrique Centrale, c'est une question de survie et de compétitivité. Face au marché des ERP, Odoo s'impose comme un acteur majeur grâce à sa flexibilité et son modèle open-source. Cependant, une question revient systématiquement lors de nos consultations : <strong>faut-il opter pour la version Community (gratuite) ou investir dans la version Enterprise ?</strong></p>
-<p>Chez Spartiat-AI, nous croyons en une approche chirurgicale de la technologie. Voici une analyse sans concession pour vous aider à trancher.</p>
+<p>Chez Tidjani & Brothers, nous croyons en une approche chirurgicale de la technologie. Voici une analyse sans concession pour vous aider à trancher.</p>
 <h2>L'illusion de la gratuité : le cas Community</h2>
 <p>Odoo Community est une base solide. Elle offre un accès au code source et permet de déployer des modules fondamentaux (CRM, Ventes, Facturation de base). C'est souvent le point d'entrée idéal pour une TPE ou un développeur indépendant souhaitant tester l'écosystème.</p>
 <blockquote><p>Le coût réel d'un logiciel gratuit se mesure en heures de maintenance, en compromis fonctionnels et en dette technique.</p></blockquote>
@@ -215,9 +215,9 @@ async function main() {
 <li><strong>Modules exclusifs :</strong> qualité, code-barres pour la logistique, automatisation du marketing, et applications bancaires complètes.</li>
 <li><strong>Migration garantie :</strong> Odoo s'engage à migrer votre base de données vers les nouvelles versions, sécurisant ainsi votre investissement sur le long terme.</li>
 </ul>
-<h2>Le verdict Spartiate</h2>
+<h2>Le verdict</h2>
 <p>Si votre chiffre d'affaires dépend de la robustesse de votre système d'information, la version Community est un risque. Le temps passé par vos équipes à contourner ses limitations ou à développer des modules sur-mesure vous coûtera infiniment plus cher que la licence Enterprise.</p>
-<p>Notre mission chez Spartiat-AI est de déployer des systèmes qui accélèrent votre croissance, pas qui la freinent. C'est pourquoi nous recommandons et intégrons exclusivement <strong>Odoo Enterprise</strong>, calibré sur-mesure pour les réalités de votre secteur.</p>`,
+<p>Notre mission chez Tidjani & Brothers est de déployer des systèmes qui accélèrent votre croissance, pas qui la freinent. C'est pourquoi nous recommandons et intégrons exclusivement <strong>Odoo Enterprise</strong>, calibré sur-mesure pour les réalités de votre secteur.</p>`,
       category: "ODOO",
       coverImagePath: "/uploads/blog/community-vs-enterprise.jpg",
     },

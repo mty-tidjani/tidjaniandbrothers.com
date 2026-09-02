@@ -33,7 +33,7 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
     <nav className="border-glass-stroke bg-deep-black py-stack-md fixed top-0 left-0 hidden h-screen w-64 flex-col border-r md:flex">
       <div className="mb-stack-lg px-gutter">
         <h1 className="text-headline-sm text-primary tracking-tighter">
-          Spartiat-AI
+          Tidjani & Brothers
         </h1>
         <p className="text-label-caps text-on-surface-variant mt-1 tracking-widest uppercase">
           Admin Terminal
