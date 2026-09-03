@@ -9,6 +9,7 @@ import {
   Users,
   Smartphone,
 } from "lucide-react";
+import Link from "next/link";
 import { PricingTier } from "@/components/site/PricingTier";
 import { CTASection } from "@/components/site/CTASection";
 import { getServiceTiers, getMaintenancePlan } from "@/lib/data/services";
@@ -44,12 +45,12 @@ export default async function OdooServicesPage() {
           Solutions <span className="text-primary">Odoo</span> sur-mesure
         </h1>
         <p className="mb-stack-lg text-body-lg text-on-surface-variant mx-auto max-w-3xl">
-          Chez Tidjani & Brothers, nous accompagnons les entreprises camerounaises dans
-          leur transition vers une gestion moderne et centralisée grâce à Odoo,
-          la solution ERP tout-en-un pour PME. Vous démarrez de zéro&nbsp;? Nous
-          installons et configurons votre solution Odoo clé en main. Vous avez
-          déjà une installation existante&nbsp;? Nous intervenons en support,
-          optimisation et maintenance.
+          Chez Tidjani & Brothers, nous accompagnons les entreprises
+          camerounaises dans leur transition vers une gestion moderne et
+          centralisée grâce à Odoo, la solution ERP tout-en-un pour PME. Vous
+          démarrez de zéro&nbsp;? Nous installons et configurons votre solution
+          Odoo clé en main. Vous avez déjà une installation existante&nbsp;?
+          Nous intervenons en support, optimisation et maintenance.
         </p>
       </section>
 
@@ -78,6 +79,15 @@ export default async function OdooServicesPage() {
             </p>
           </div>
         </div>
+        <p className="text-on-surface-variant mt-stack-md text-center">
+          Besoin uniquement d&rsquo;une formation&nbsp;?{" "}
+          <Link
+            href="/services/formation"
+            className="text-primary hover:underline"
+          >
+            Voir notre page dédiée →
+          </Link>
+        </p>
       </section>
 
       <section className="container-max px-margin-mobile pb-section-gap-mobile md:px-gutter md:pb-section-gap-desktop">

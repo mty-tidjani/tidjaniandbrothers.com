@@ -90,6 +90,7 @@ export const COMPANY_FACEBOOK_URL = "https://www.facebook.com";
 export const NAV_LINKS = [
   { href: "/", label: "Accueil" },
   { href: "/services/odoo", label: "Services Odoo" },
+  { href: "/services/formation", label: "Formation Odoo" },
   { href: "/services/web-design", label: "Web Design" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/blog", label: "Blog" },
