@@ -27,7 +27,7 @@ export default async function PortfolioPage() {
           Aucune étude de cas publiée pour le moment.
         </p>
       ) : (
-        <div className="gap-gutter pb-section-gap-desktop grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="gap-gutter pb-section-gap-desktop grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
           {caseStudies.map((study, index) => (
             <CaseStudyCard
               key={study.id}
