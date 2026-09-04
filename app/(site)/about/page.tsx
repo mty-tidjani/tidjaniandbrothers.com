@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { GraduationCap, HeartHandshake } from "lucide-react";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "À propos",
   description:
     "Fondée en 2021 à Yaoundé, Tidjani & Brothers a évolué du web design vers l'implémentation Odoo ERP pour PME camerounaises. We build IT for you.",
-};
+  path: "/about",
+});
 
 const TIMELINE = [
   {
@@ -72,7 +74,7 @@ export default function AboutPage() {
               >
                 <Image
                   src={item.image}
-                  alt=""
+                  alt={item.title}
                   fill
                   sizes="(min-width: 768px) 40vw, 100vw"
                   className="object-cover"

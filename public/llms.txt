@@ -1,0 +1,34 @@
+# Tidjani & Brothers
+
+> Tidjani & Brothers is an IT services company based in Yaoundé, Cameroon.
+> We help small and medium businesses (PME) across Cameroon adopt Odoo ERP,
+> and build custom web sites, for a unified, locally-supported tech stack.
+
+Language: French (primary site content). Currency: FCFA. Service area: Cameroon.
+
+## Services
+
+- Odoo ERP installation and support: invoicing, inventory, sales, accounting,
+  CRM, point of sale, mobile money integration (MTN MoMo, Orange Money).
+  https://tidjaniandbrothers.com/services/odoo
+- Odoo training (initial, continuing, advanced/key-user), on-site or remote.
+  https://tidjaniandbrothers.com/services/formation
+- Web design: storefront, e-commerce, portfolio, and custom sites, connected
+  to the same Odoo backend when relevant.
+  https://tidjaniandbrothers.com/services/web-design
+
+## Key pages
+
+- Homepage: https://tidjaniandbrothers.com/
+- About: https://tidjaniandbrothers.com/about
+- Portfolio (case studies): https://tidjaniandbrothers.com/portfolio
+- Blog (Odoo & digitalization advice for Cameroonian SMEs): https://tidjaniandbrothers.com/blog
+- Contact: https://tidjaniandbrothers.com/contact
+- Book a free audit: https://tidjaniandbrothers.com/reserver-audit
+- Request a quote: https://tidjaniandbrothers.com/demande-devis
+
+## Notes for agents
+
+- Structured data (schema.org LocalBusiness, Service, BlogPosting,
+  BreadcrumbList) is embedded as JSON-LD on the relevant pages.
+- The `/admin` and `/api` paths are internal and excluded via robots.txt.

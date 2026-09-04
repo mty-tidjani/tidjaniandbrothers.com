@@ -32,7 +32,7 @@ export function BlogCard({
           <div className="relative aspect-video w-full overflow-hidden">
             <Image
               src={coverImagePath}
-              alt=""
+              alt={title}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
               className="object-cover"

@@ -3,12 +3,14 @@ import { Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { Button } from "@/components/ui/Button";
 import { getCompanySettings } from "@/lib/data/settings";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Contact",
   description:
     "Contactez Tidjani & Brothers à Yaoundé pour votre projet Odoo ERP ou site web, ou réservez directement un audit gratuit de 30 minutes.",
-};
+  path: "/contact",
+});
 
 export default async function ContactPage() {
   const settings = await getCompanySettings();

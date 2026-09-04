@@ -4,10 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CTASection } from "@/components/site/CTASection";
-import { getPublishedCaseStudyBySlug } from "@/lib/data/portfolio";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildMetadata } from "@/lib/seo";
+import { getBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
+import {
+  getPublishedCaseStudyBySlug,
+  getPublishedCaseStudies,
+} from "@/lib/data/portfolio";
 import { getCompanySettings } from "@/lib/data/settings";
 
 type PageProps = { params: Promise<{ slug: string }> };
+
+export async function generateStaticParams() {
+  const caseStudies = await getPublishedCaseStudies();
+  return caseStudies.map((study) => ({ slug: study.slug }));
+}
 
 export async function generateMetadata({
   params,
@@ -15,10 +26,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const study = await getPublishedCaseStudyBySlug(slug);
   if (!study) return {};
-  return {
+  return buildMetadata({
     title: study.sector,
     description: study.after,
-  };
+    path: `/portfolio/${slug}`,
+    imagePath: `/api/og/portfolio/${slug}`,
+  });
 }
 
 export default async function CaseStudyDetailPage({ params }: PageProps) {
@@ -33,6 +46,13 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
   return (
     <>
       <article className="container-max px-margin-mobile pb-section-gap-mobile md:px-gutter">
+        <JsonLd
+          data={getBreadcrumbJsonLd([
+            { name: "Accueil", path: "/" },
+            { name: "Portfolio", path: "/portfolio" },
+            { name: study.sector, path: `/portfolio/${slug}` },
+          ])}
+        />
         <Link
           href="/portfolio"
           className="mb-stack-md text-label-caps text-primary inline-flex items-center gap-2 hover:underline"
@@ -48,7 +68,7 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
           <div className="border-glass-stroke mb-stack-lg relative aspect-video w-full overflow-hidden rounded-2xl border">
             <Image
               src={study.imagePaths[0]}
-              alt=""
+              alt={`${study.sector} — étude de cas Tidjani & Brothers`}
               fill
               sizes="(min-width: 1024px) 1024px, 100vw"
               className="object-cover"

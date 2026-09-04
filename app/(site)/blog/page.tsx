@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { BlogCard } from "@/components/site/BlogCard";
 import { getPublishedBlogPosts } from "@/lib/data/blog";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Blog",
   description:
     "Conseils digitalisation, Odoo ERP et actualités pour les PME camerounaises.",
-};
+  path: "/blog",
+});
 
 export default async function BlogPage() {
   const posts = await getPublishedBlogPosts();

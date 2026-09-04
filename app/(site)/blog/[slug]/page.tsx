@@ -6,11 +6,20 @@ import { ArrowLeft } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { NewsletterForm } from "@/components/forms/NewsletterForm";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { BLOG_CATEGORY_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
-import { getPublishedBlogPostBySlug } from "@/lib/data/blog";
+import { buildMetadata } from "@/lib/seo";
+import { getBlogPostingJsonLd } from "@/lib/seo/article";
+import { getBreadcrumbJsonLd } from "@/lib/seo/breadcrumbs";
+import { getPublishedBlogPostBySlug, getPublishedBlogPosts } from "@/lib/data/blog";
 
 type PageProps = { params: Promise<{ slug: string }> };
+
+export async function generateStaticParams() {
+  const posts = await getPublishedBlogPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
 
 export async function generateMetadata({
   params,
@@ -18,10 +27,15 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getPublishedBlogPostBySlug(slug);
   if (!post) return {};
-  return {
+  return buildMetadata({
     title: post.metaTitle || post.title,
     description: post.metaDescription || post.excerpt,
-  };
+    path: `/blog/${slug}`,
+    type: "article",
+    publishedTime: post.publishedAt,
+    modifiedTime: post.updatedAt,
+    imagePath: `/api/og/blog/${slug}`,
+  });
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
@@ -31,6 +45,22 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <article className="container-max px-margin-mobile pb-section-gap-desktop md:px-gutter">
+      <JsonLd
+        data={getBlogPostingJsonLd({
+          slug,
+          title: post.title,
+          description: post.metaDescription || post.excerpt,
+          publishedAt: post.publishedAt,
+          updatedAt: post.updatedAt,
+        })}
+      />
+      <JsonLd
+        data={getBreadcrumbJsonLd([
+          { name: "Accueil", path: "/" },
+          { name: "Blog", path: "/blog" },
+          { name: post.title, path: `/blog/${slug}` },
+        ])}
+      />
       <Link
         href="/blog"
         className="mb-stack-md text-label-caps text-primary inline-flex items-center gap-2 hover:underline"
@@ -57,7 +87,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         <div className="border-glass-stroke mb-section-gap-mobile relative aspect-video max-w-3xl overflow-hidden rounded-2xl border">
           <Image
             src={post.coverImagePath}
-            alt=""
+            alt={post.title}
             fill
             sizes="(min-width: 1024px) 768px, 100vw"
             className="object-cover"

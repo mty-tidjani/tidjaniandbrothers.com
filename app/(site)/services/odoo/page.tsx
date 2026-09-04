@@ -16,12 +16,18 @@ import { CTASection } from "@/components/site/CTASection";
 import { getServiceTiers, getMaintenancePlan } from "@/lib/data/services";
 import { getCompanySettings } from "@/lib/data/settings";
 import { formatPriceRange } from "@/lib/format";
+import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getServiceJsonLd } from "@/lib/seo/service";
 
-export const metadata: Metadata = {
+const SERVICE_DESCRIPTION =
+  "Installation et support Odoo ERP pour PME camerounaises : facturation, stock, ventes, comptabilité, CRM et intégration mobile money (MTN MoMo, Orange Money).";
+
+export const metadata: Metadata = buildMetadata({
   title: "Services Odoo ERP",
-  description:
-    "Installation et support Odoo ERP pour PME camerounaises : facturation, stock, ventes, comptabilité, CRM et intégration mobile money (MTN MoMo, Orange Money).",
-};
+  description: SERVICE_DESCRIPTION,
+  path: "/services/odoo",
+});
 
 const MODULES = [
   { icon: Receipt, label: "Facturation" },
@@ -41,6 +47,12 @@ export default async function OdooServicesPage() {
 
   return (
     <>
+      <JsonLd
+        data={getServiceJsonLd({
+          name: "Services Odoo ERP",
+          description: SERVICE_DESCRIPTION,
+        })}
+      />
       <section className="container-max px-margin-mobile pb-section-gap-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop text-center">
         <h1 className="text-display mb-stack-md text-on-surface">
           Solutions <span className="text-primary">Odoo</span> sur-mesure

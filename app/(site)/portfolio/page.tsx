@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { CaseStudyCard } from "@/components/site/CaseStudyCard";
 import { getPublishedCaseStudies } from "@/lib/data/portfolio";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Portfolio",
   description:
     "Études de cas réelles de transformations Odoo ERP pour des PME camerounaises.",
-};
+  path: "/portfolio",
+});
 
 export default async function PortfolioPage() {
   const caseStudies = await getPublishedCaseStudies();

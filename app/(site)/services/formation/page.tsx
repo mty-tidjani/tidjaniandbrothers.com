@@ -13,12 +13,18 @@ import { ServiceCard } from "@/components/site/ServiceCard";
 import { PricingTier } from "@/components/site/PricingTier";
 import { CTASection } from "@/components/site/CTASection";
 import { getCompanySettings } from "@/lib/data/settings";
+import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getServiceJsonLd } from "@/lib/seo/service";
 
-export const metadata: Metadata = {
+const SERVICE_DESCRIPTION =
+  "Formation Odoo pour votre équipe : prise en main, mise à niveau ou formation avancée, sur site ou à distance, en français ou en anglais.";
+
+export const metadata: Metadata = buildMetadata({
   title: "Formation Odoo",
-  description:
-    "Formation Odoo pour votre équipe : prise en main, mise à niveau ou formation avancée, sur site ou à distance, en français ou en anglais.",
-};
+  description: SERVICE_DESCRIPTION,
+  path: "/services/formation",
+});
 
 const FORMATS = [
   {
@@ -52,6 +58,12 @@ export default async function FormationPage() {
 
   return (
     <>
+      <JsonLd
+        data={getServiceJsonLd({
+          name: "Formation Odoo",
+          description: SERVICE_DESCRIPTION,
+        })}
+      />
       <section className="container-max px-margin-mobile pb-section-gap-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop text-center">
         <h1 className="text-display mb-stack-md text-on-surface">
           Formation Odoo pour <span className="text-primary">votre équipe</span>

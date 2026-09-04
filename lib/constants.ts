@@ -128,6 +128,8 @@ export const ROLE_LABELS: Record<string, string> = {
   EDITOR: "Éditeur (blog / portfolio)",
 };
 
+export const SITE_URL = "https://tidjaniandbrothers.com";
+
 export const COMPANY_PHONE = "+237 6 98 96 67 19";
 export const COMPANY_PHONE_TEL = "tel:+237698966719";
 export const COMPANY_EMAIL = "contact@tidjaniandbrothers.com";

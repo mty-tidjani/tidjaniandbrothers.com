@@ -3,12 +3,18 @@ import Image from "next/image";
 import { ShoppingCart, Store, GalleryHorizontal, Code2 } from "lucide-react";
 import { CTASection } from "@/components/site/CTASection";
 import { getCompanySettings } from "@/lib/data/settings";
+import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getServiceJsonLd } from "@/lib/seo/service";
 
-export const metadata: Metadata = {
+const SERVICE_DESCRIPTION =
+  "Site vitrine, e-commerce ou portfolio, conçu par la même équipe que votre projet Odoo pour un seul point de contact et une expérience cohérente.";
+
+export const metadata: Metadata = buildMetadata({
   title: "Web Design",
-  description:
-    "Site vitrine, e-commerce ou portfolio, conçu par la même équipe que votre projet Odoo pour un seul point de contact et une expérience cohérente.",
-};
+  description: SERVICE_DESCRIPTION,
+  path: "/services/web-design",
+});
 
 const OFFERS = [
   {
@@ -42,6 +48,12 @@ export default async function WebDesignServicesPage() {
 
   return (
     <>
+      <JsonLd
+        data={getServiceJsonLd({
+          name: "Web Design",
+          description: SERVICE_DESCRIPTION,
+        })}
+      />
       <section className="container-max px-margin-mobile pb-section-gap-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
         <div className="gap-gutter grid grid-cols-1 items-center md:grid-cols-2">
           <div>
@@ -57,7 +69,7 @@ export default async function WebDesignServicesPage() {
           <div className="border-glass-stroke relative hidden aspect-video overflow-hidden rounded-2xl border md:block">
             <Image
               src="/uploads/services/web-design-hero.jpg"
-              alt=""
+              alt="Exemple de site web réalisé par Tidjani & Brothers"
               fill
               sizes="40vw"
               className="object-cover"

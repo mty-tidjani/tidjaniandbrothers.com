@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Globe, MapPin, Smartphone, Tag } from "lucide-react";
+import { Globe, MapPin, Tag } from "lucide-react";
 import { Search, FileWarning, AlertTriangle } from "lucide-react";
 import { Blocks, LayoutTemplate } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -9,12 +9,14 @@ import { CaseStudyCard } from "@/components/site/CaseStudyCard";
 import { CTASection } from "@/components/site/CTASection";
 import { getCompanySettings } from "@/lib/data/settings";
 import { getPublishedCaseStudies } from "@/lib/data/portfolio";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Accueil",
   description:
     "Votre entreprise mérite mieux qu'Excel. Tidjani & Brothers déploie Odoo ERP sur-mesure pour les PME camerounaises : facturation, stock, ventes, comptabilité.",
-};
+  path: "/",
+});
 
 const PAIN_POINTS = [
   {
