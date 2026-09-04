@@ -77,11 +77,14 @@ export default async function HomePage() {
             ventes et comptabilité réunis dans un seul système, configuré
             sur-mesure pour votre PME camerounaise.
           </p>
-          <div className="flex flex-col gap-4 sm:flex-row">
+          <div className="flex flex-col gap-4 mb-6 sm:flex-row">
             <Button href="/reserver-audit" size="lg">
               Réserver un audit gratuit
             </Button>
-            <Button href="/services/odoo" variant="secondary" size="lg">
+            <Button href="/demande-devis" variant="secondary" size="lg">
+              Demander un devis
+            </Button>
+            <Button href="/services/odoo" variant="tertiary" size="lg">
               Voir nos services
             </Button>
           </div>
@@ -91,7 +94,6 @@ export default async function HomePage() {
       <section className="border-glass-stroke bg-surface-container/30 border-y py-8">
         <div className="container-max px-margin-mobile md:px-gutter flex flex-wrap justify-center gap-8 md:justify-between md:gap-16">
           <TrustBadge icon={Globe} label="Livraison bilingue FR/EN" />
-          <TrustBadge icon={Smartphone} label="Mobile Money intégré" />
           <TrustBadge icon={MapPin} label="Équipe locale à Yaoundé" />
           <TrustBadge icon={Tag} label="Tarifs fixes et transparents" />
         </div>

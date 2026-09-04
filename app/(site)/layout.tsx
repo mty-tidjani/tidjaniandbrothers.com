@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { StickyDevisButton } from "@/components/site/StickyDevisButton";
 import { getCompanySettings } from "@/lib/data/settings";
 
 export default async function SiteLayout({
@@ -20,6 +21,7 @@ export default async function SiteLayout({
         address={settings.address}
         facebookUrl={settings.facebookUrl}
       />
+      <StickyDevisButton />
     </>
   );
 }

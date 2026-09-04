@@ -2,9 +2,10 @@ import Link from "next/link";
 import { Facebook, Mail, MapPin, Phone } from "lucide-react";
 import { NAV_LINKS, isNavGroup, type NavLeaf } from "@/lib/constants";
 
-const FOOTER_LINKS: NavLeaf[] = NAV_LINKS.flatMap((entry) =>
-  isNavGroup(entry) ? entry.children : [entry],
-);
+const FOOTER_LINKS: NavLeaf[] = [
+  ...NAV_LINKS.flatMap((entry) => (isNavGroup(entry) ? entry.children : [entry])),
+  { href: "/demande-devis", label: "Demander un devis" },
+];
 
 type FooterProps = {
   phone: string;

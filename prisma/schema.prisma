@@ -25,6 +25,14 @@ enum LeadStatus {
   PERDU
 }
 
+enum QuoteStatus {
+  BROUILLON
+  SOUMIS
+  DEVIS_ENVOYE
+  CONVERTI
+  PERDU
+}
+
 enum BlogCategory {
   ODOO
   DIGITALISATION
@@ -45,10 +53,11 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  blogPosts        BlogPost[]
-  leadNotes        LeadNote[]
-  leadStatusEvents LeadStatusEvent[]
-  passwordResets   PasswordResetToken[]
+  blogPosts         BlogPost[]
+  leadNotes         LeadNote[]
+  leadStatusEvents  LeadStatusEvent[]
+  passwordResets    PasswordResetToken[]
+  quoteStatusEvents QuoteStatusEvent[]
 }
 
 model Lead {
@@ -94,6 +103,44 @@ model LeadStatusEvent {
 
   lead  Lead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
   actor User? @relation(fields: [actorId], references: [id])
+}
+
+model QuoteRequest {
+  id              String      @id @default(cuid())
+  sessionId       String      @unique
+  status          QuoteStatus @default(BROUILLON)
+  currentStep     Int         @default(1)
+  answers         Json        @default("{}")
+
+  companyName     String?
+  contactName     String?
+  contactPhone    String?
+  contactEmail    String?
+  budgetMentioned String?
+
+  proposedAmount  Int?
+  internalNote    String?
+
+  submittedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  statusEvents QuoteStatusEvent[]
+
+  @@index([status])
+  @@index([updatedAt])
+}
+
+model QuoteStatusEvent {
+  id         String       @id @default(cuid())
+  quoteId    String
+  fromStatus QuoteStatus?
+  toStatus   QuoteStatus
+  actorId    String?
+  createdAt  DateTime     @default(now())
+
+  quote QuoteRequest @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  actor User?         @relation(fields: [actorId], references: [id])
 }
 
 model BlogPost {

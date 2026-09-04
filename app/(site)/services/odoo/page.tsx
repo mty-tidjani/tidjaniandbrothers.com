@@ -10,6 +10,7 @@ import {
   UserCog,
 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { PricingTier } from "@/components/site/PricingTier";
 import { CTASection } from "@/components/site/CTASection";
 import { getServiceTiers, getMaintenancePlan } from "@/lib/data/services";
@@ -52,6 +53,14 @@ export default async function OdooServicesPage() {
           Odoo clé en main. Vous avez déjà une installation existante&nbsp;?
           Nous intervenons en support, optimisation et maintenance.
         </p>
+        <div className="mt-stack-lg flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Button href="/demande-devis" size="lg">
+            Demander un devis
+          </Button>
+          <Button href="/reserver-audit" variant="secondary" size="lg">
+            Réserver un audit gratuit
+          </Button>
+        </div>
       </section>
 
       <section className="container-max px-margin-mobile pb-section-gap-mobile md:px-gutter md:pb-section-gap-desktop">
@@ -152,6 +161,7 @@ export default async function OdooServicesPage() {
         description="Réservez un audit gratuit de 30 minutes, sans engagement."
         phone={settings.phone}
         email={settings.email}
+        extraCta={{ href: "/demande-devis", label: "Demander un devis" }}
       />
     </>
   );

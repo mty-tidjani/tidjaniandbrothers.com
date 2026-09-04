@@ -43,6 +43,30 @@ export const PREFERRED_SLOTS = [
   { value: "flexible", label: "Flexible" },
 ] as const;
 
+export const DEVIS_FEATURES = [
+  { value: "facturation", label: "Facturation" },
+  { value: "gestion_stock", label: "Gestion de stock" },
+  { value: "ventes_crm", label: "Ventes / CRM" },
+  { value: "comptabilite", label: "Comptabilité complète" },
+  { value: "point_de_vente", label: "Point de vente" },
+  { value: "rh_paie", label: "RH / Paie" },
+  { value: "production", label: "Production" },
+  { value: "multi_entrepot", label: "Multi-entrepôt" },
+] as const;
+
+export const DEVIS_HARDWARE = [
+  { value: "ordinateurs", label: "Ordinateurs" },
+  { value: "imprimante_recus", label: "Imprimante à reçus" },
+  { value: "lecteur_code_barres", label: "Lecteur code-barres" },
+  { value: "autre", label: "Autre" },
+] as const;
+
+export const DEVIS_TIMELINES = [
+  { value: "cette_semaine", label: "Cette semaine" },
+  { value: "ce_mois", label: "Ce mois" },
+  { value: "flexible", label: "Flexible" },
+] as const;
+
 export const LEAD_STATUS_LABELS: Record<string, string> = {
   NOUVEAU: "Nouveau",
   CONTACTE: "Contacté",
@@ -66,6 +90,31 @@ export const LEAD_STATUS_STYLES: Record<string, string> = {
   AUDIT_PLANIFIE: "bg-blue-500/10 text-blue-400 border-blue-500/30",
   CONVERTI: "bg-green-500/10 text-green-400 border-green-500/30",
   PERDU: "bg-surface-variant text-on-surface-variant border-outline-variant",
+};
+
+export const QUOTE_STATUS_LABELS: Record<string, string> = {
+  BROUILLON: "Brouillon",
+  SOUMIS: "Soumis",
+  DEVIS_ENVOYE: "Devis envoyé",
+  CONVERTI: "Converti",
+  PERDU: "Perdu",
+};
+
+export const QUOTE_STATUS_ORDER = [
+  "BROUILLON",
+  "SOUMIS",
+  "DEVIS_ENVOYE",
+  "CONVERTI",
+  "PERDU",
+] as const;
+
+// Tailwind class fragments keyed by status, consumed by <DevisStatusBadge>.
+export const QUOTE_STATUS_STYLES: Record<string, string> = {
+  BROUILLON: "bg-surface-variant text-on-surface-variant border-outline-variant",
+  SOUMIS: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
+  DEVIS_ENVOYE: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+  CONVERTI: "bg-green-500/10 text-green-400 border-green-500/30",
+  PERDU: "bg-on-surface-variant/10 text-on-surface-variant border-outline-variant",
 };
 
 export const BLOG_CATEGORY_LABELS: Record<string, string> = {
@@ -120,6 +169,7 @@ type AdminNavLink = {
 export const ADMIN_NAV_LINKS: AdminNavLink[] = [
   { href: "/admin", label: "Tableau de bord", icon: "dashboard" },
   { href: "/admin/leads", label: "Demandes", icon: "leaderboard" },
+  { href: "/admin/devis", label: "Devis", icon: "request_quote" },
   { href: "/admin/blog", label: "Blog", icon: "edit_note" },
   { href: "/admin/portfolio", label: "Portfolio", icon: "business_center" },
   {

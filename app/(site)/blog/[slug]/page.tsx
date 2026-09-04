@@ -81,7 +81,12 @@ export default async function BlogPostPage({ params }: PageProps) {
           <p className="mb-stack-md text-on-surface-variant">
             Réservez un audit gratuit pour évaluer votre situation.
           </p>
-          <Button href="/reserver-audit">Réserver un audit gratuit</Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button href="/reserver-audit">Réserver un audit gratuit</Button>
+            <Button href="/demande-devis" variant="secondary">
+              Demander un devis
+            </Button>
+          </div>
         </GlassCard>
 
         <GlassCard className="p-6">

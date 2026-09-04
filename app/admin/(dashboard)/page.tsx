@@ -6,6 +6,7 @@ import {
   FileText,
   TrendingUp,
   ArrowRight,
+  ClipboardList,
 } from "lucide-react";
 import { StatWidget } from "@/components/admin/StatWidget";
 import { LeadsTable } from "@/components/admin/LeadsTable";
@@ -57,6 +58,18 @@ export default async function AdminDashboardPage() {
           value={`${stats.conversionRate.toFixed(1)}%`}
           icon={TrendingUp}
           hint="Demandes → clients"
+        />
+        <StatWidget
+          label="Devis en cours"
+          value={String(stats.enCoursCount)}
+          icon={ClipboardList}
+          hint="Soumis ou envoyés"
+        />
+        <StatWidget
+          label="Taux de complétion du formulaire"
+          value={`${stats.completionRate.toFixed(1)}%`}
+          icon={FileText}
+          hint={stats.dropoffHint}
         />
       </div>
 

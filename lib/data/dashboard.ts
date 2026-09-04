@@ -14,6 +14,10 @@ export async function getDashboardStats() {
     postsThisMonth,
     totalLeads,
     convertedLeads,
+    enCoursCount,
+    totalQuotes,
+    completedQuotes,
+    dropoffGroups,
   ] = await Promise.all([
     prisma.lead.count({ where: { createdAt: { gte: startOfWeek } } }),
     prisma.lead.count({ where: { status: "AUDIT_PLANIFIE" } }),
@@ -22,10 +26,37 @@ export async function getDashboardStats() {
     }),
     prisma.lead.count(),
     prisma.lead.count({ where: { status: "CONVERTI" } }),
+    prisma.quoteRequest.count({
+      where: { status: { in: ["SOUMIS", "DEVIS_ENVOYE"] } },
+    }),
+    prisma.quoteRequest.count(),
+    prisma.quoteRequest.count({ where: { status: { not: "BROUILLON" } } }),
+    prisma.quoteRequest.groupBy({
+      by: ["currentStep"],
+      where: { status: "BROUILLON" },
+      _count: true,
+      orderBy: { _count: { currentStep: "desc" } },
+      take: 1,
+    }),
   ]);
 
   const conversionRate =
     totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
+  const completionRate =
+    totalQuotes > 0 ? (completedQuotes / totalQuotes) * 100 : 0;
+  const topDropoffStep = dropoffGroups[0]?.currentStep;
+  const dropoffHint =
+    topDropoffStep !== undefined
+      ? `Abandon fréquent à l'étape ${topDropoffStep}/9`
+      : undefined;
 
-  return { newThisWeek, auditsToSchedule, postsThisMonth, conversionRate };
+  return {
+    newThisWeek,
+    auditsToSchedule,
+    postsThisMonth,
+    conversionRate,
+    enCoursCount,
+    completionRate,
+    dropoffHint,
+  };
 }

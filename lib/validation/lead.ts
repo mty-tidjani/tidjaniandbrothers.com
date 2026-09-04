@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Cameroonian mobile numbers: optionally prefixed +237, then 9 digits starting 6.
-const phoneRegex = /^(\+?237)?6\d{8}$/;
+export const phoneRegex = /^(\+?237)?6\d{8}$/;
 
 export const auditStep1Schema = z.object({
   fullName: z.string().trim().min(2, "Le nom complet est requis"),

@@ -151,6 +151,11 @@ export function Navbar() {
           </div>
           <ThemeToggle />
           <div className="hidden md:block">
+            <Button href="/demande-devis" variant="secondary" size="md">
+              Demander un devis
+            </Button>
+          </div>
+          <div className="hidden md:block">
             <Button href="/contact" size="md">
               Contactez-nous
             </Button>
@@ -223,6 +228,13 @@ export function Navbar() {
               </Link>
             );
           })}
+          <Link
+            href="/demande-devis"
+            onClick={() => setOpen(false)}
+            className="border-primary text-primary mt-2 rounded-lg border px-4 py-3 text-center font-bold"
+          >
+            Demander un devis
+          </Link>
           <Link
             href="/contact"
             onClick={() => setOpen(false)}

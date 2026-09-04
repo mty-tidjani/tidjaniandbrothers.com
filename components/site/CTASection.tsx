@@ -6,6 +6,7 @@ type CTASectionProps = {
   description: string;
   phone: string;
   email: string;
+  extraCta?: { href: string; label: string };
 };
 
 export function CTASection({
@@ -13,6 +14,7 @@ export function CTASection({
   description,
   phone,
   email,
+  extraCta,
 }: CTASectionProps) {
   return (
     <section className="container-max px-margin-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
@@ -26,6 +28,11 @@ export function CTASection({
           <Button href="/contact" variant="secondary" size="lg">
             Nous contacter
           </Button>
+          {extraCta ? (
+            <Button href={extraCta.href} variant="tertiary" size="lg">
+              {extraCta.label}
+            </Button>
+          ) : null}
         </div>
         <div className="text-on-surface-variant mt-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-8">
           <a

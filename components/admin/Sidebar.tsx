@@ -12,6 +12,7 @@ import {
   Users,
   Settings,
   LogOut,
+  Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ADMIN_NAV_LINKS } from "@/lib/constants";
@@ -19,6 +20,7 @@ import { ADMIN_NAV_LINKS } from "@/lib/constants";
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   dashboard: LayoutDashboard,
   leaderboard: ListChecks,
+  request_quote: Receipt,
   edit_note: FileEdit,
   business_center: Briefcase,
   extension: Blocks,
