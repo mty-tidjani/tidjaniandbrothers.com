@@ -17,7 +17,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: "Tidjani & Brothers | We make IT for you",
+    default: "Tidjani & Brothers | We build robust IT solutions",
     template: "%s | Tidjani & Brothers",
   },
   description:

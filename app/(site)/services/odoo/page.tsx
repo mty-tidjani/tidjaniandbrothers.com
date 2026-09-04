@@ -7,7 +7,7 @@ import {
   ShoppingCart,
   Calculator,
   Users,
-  Smartphone,
+  UserCog,
 } from "lucide-react";
 import Link from "next/link";
 import { PricingTier } from "@/components/site/PricingTier";
@@ -28,7 +28,7 @@ const MODULES = [
   { icon: ShoppingCart, label: "Ventes" },
   { icon: Calculator, label: "Comptabilité" },
   { icon: Users, label: "CRM" },
-  { icon: Smartphone, label: "Paiement mobile" },
+  { icon: UserCog, label: "Ressources Humaines" },
 ];
 
 export default async function OdooServicesPage() {

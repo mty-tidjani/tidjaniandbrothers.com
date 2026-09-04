@@ -87,15 +87,28 @@ export const COMPANY_ADDRESS =
   "Awaye — près du Collège Père Monti, Yaoundé, Cameroun";
 export const COMPANY_FACEBOOK_URL = "https://www.facebook.com";
 
-export const NAV_LINKS = [
+export type NavLeaf = { href: string; label: string };
+export type NavGroup = { label: string; children: NavLeaf[] };
+export type NavEntry = NavLeaf | NavGroup;
+
+export function isNavGroup(entry: NavEntry): entry is NavGroup {
+  return "children" in entry;
+}
+
+export const NAV_LINKS: NavEntry[] = [
   { href: "/", label: "Accueil" },
-  { href: "/services/odoo", label: "Services Odoo" },
-  { href: "/services/formation", label: "Formation Odoo" },
-  { href: "/services/web-design", label: "Web Design" },
+  {
+    label: "Services",
+    children: [
+      { href: "/services/odoo", label: "Services Odoo" },
+      { href: "/services/formation", label: "Formation Odoo" },
+      { href: "/services/web-design", label: "Web Design" },
+    ],
+  },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "À propos" },
-] as const;
+];
 
 type AdminNavLink = {
   href: string;

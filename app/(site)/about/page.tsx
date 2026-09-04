@@ -89,7 +89,7 @@ export default function AboutPage() {
             Notre philosophie
           </h2>
           <p className="text-headline-sm text-primary italic">
-            &laquo; We make IT for you &raquo;
+            &laquo; We build robust IT solutions &raquo;
           </p>
         </div>
         <div className="gap-stack-md grid grid-cols-1 md:grid-cols-2">

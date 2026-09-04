@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { Facebook, Mail, MapPin, Phone } from "lucide-react";
-import { NAV_LINKS } from "@/lib/constants";
+import { NAV_LINKS, isNavGroup, type NavLeaf } from "@/lib/constants";
+
+const FOOTER_LINKS: NavLeaf[] = NAV_LINKS.flatMap((entry) =>
+  isNavGroup(entry) ? entry.children : [entry],
+);
 
 type FooterProps = {
   phone: string;
@@ -17,7 +21,7 @@ export function Footer({ phone, email, address, facebookUrl }: FooterProps) {
           <h2 className="text-headline-sm text-on-surface mb-2 font-bold">
             Tidjani & Brothers
           </h2>
-          <p className="text-body-lg text-primary">We make IT for you</p>
+          <p className="text-body-lg text-primary">We build robust IT solutions</p>
         </div>
 
         <nav
@@ -25,7 +29,7 @@ export function Footer({ phone, email, address, facebookUrl }: FooterProps) {
           aria-label="Liens rapides"
         >
           <span className="text-label-caps text-primary mb-1">Navigation</span>
-          {NAV_LINKS.map((link) => (
+          {FOOTER_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -76,7 +80,8 @@ export function Footer({ phone, email, address, facebookUrl }: FooterProps) {
 
       <div className="container-max mt-stack-lg border-glass-stroke/50 px-margin-mobile md:px-gutter border-t pt-8">
         <p className="text-on-surface-variant text-sm">
-          © {new Date().getFullYear()} Tidjani & Brothers SARL, all rights reserved.
+          © {new Date().getFullYear()} Tidjani & Brothers SARL, all rights
+          reserved.
         </p>
       </div>
     </footer>
