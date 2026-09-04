@@ -1,10 +1,13 @@
 import { ImageResponse } from "next/og";
+import { getLogoDataUri } from "@/lib/seo/logo-asset";
 
 export const alt = "Tidjani & Brothers — We build robust IT solutions";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function Image() {
+export default async function Image() {
+  const logoSrc = await getLogoDataUri();
+
   return new ImageResponse(
     (
       <div
@@ -18,7 +21,19 @@ export default function Image() {
           background: "#101415",
         }}
       >
-        <div style={{ width: 96, height: 8, background: "#00c2cb" }} />
+        <div
+          style={{
+            width: 88,
+            height: 88,
+            borderRadius: 16,
+            background: "#ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <img src={logoSrc} width={72} height={72} alt="" />
+        </div>
         <div
           style={{
             marginTop: 40,

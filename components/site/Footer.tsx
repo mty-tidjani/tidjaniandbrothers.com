@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Facebook, Mail, MapPin, Phone } from "lucide-react";
 import { NAV_LINKS, isNavGroup, type NavLeaf } from "@/lib/constants";
+import { Logo } from "@/components/site/Logo";
 
 const FOOTER_LINKS: NavLeaf[] = [
   ...NAV_LINKS.flatMap((entry) => (isNavGroup(entry) ? entry.children : [entry])),
@@ -19,9 +20,12 @@ export function Footer({ phone, email, address, facebookUrl }: FooterProps) {
     <footer className="border-glass-stroke bg-surface-container-lowest pt-section-gap-mobile w-full border-t pb-8">
       <div className="container-max gap-gutter px-margin-mobile md:px-gutter grid grid-cols-1 md:grid-cols-4">
         <div className="md:col-span-1">
-          <h2 className="text-headline-sm text-on-surface mb-2 font-bold">
-            Tidjani & Brothers
-          </h2>
+          <div className="mb-2 flex items-center gap-3">
+            <Logo size={32} />
+            <h2 className="text-headline-sm text-on-surface font-bold">
+              Tidjani & Brothers
+            </h2>
+          </div>
           <p className="text-body-lg text-primary">We build robust IT solutions</p>
         </div>
 

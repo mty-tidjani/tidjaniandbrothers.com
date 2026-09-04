@@ -1,13 +1,17 @@
 import { ImageResponse } from "next/og";
 import { getPublishedBlogPostBySlug } from "@/lib/data/blog";
 import { BLOG_CATEGORY_LABELS } from "@/lib/constants";
+import { getLogoDataUri } from "@/lib/seo/logo-asset";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  const post = await getPublishedBlogPostBySlug(slug);
+  const [post, logoSrc] = await Promise.all([
+    getPublishedBlogPostBySlug(slug),
+    getLogoDataUri(),
+  ]);
   const title = post?.title ?? "Tidjani & Brothers";
   const category = post
     ? (BLOG_CATEGORY_LABELS[post.category] ?? post.category)
@@ -49,8 +53,25 @@ export async function GET(
         >
           {title}
         </div>
-        <div style={{ display: "flex", fontSize: 28, color: "#bbc9ca" }}>
-          Tidjani & Brothers
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 10,
+              background: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {/* next/image can't run inside next/og's Satori renderer — a plain <img> is the documented pattern here. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoSrc} width={38} height={38} alt="" />
+          </div>
+          <div style={{ display: "flex", fontSize: 28, color: "#bbc9ca" }}>
+            Tidjani & Brothers
+          </div>
         </div>
       </div>
     ),

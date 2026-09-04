@@ -33,7 +33,7 @@ export function getBlogPostingJsonLd({
       ...ORGANIZATION_REF,
       logo: {
         "@type": "ImageObject",
-        url: `${SITE_URL}/icon`,
+        url: `${SITE_URL}/brand/logo.png`,
       },
     },
   };

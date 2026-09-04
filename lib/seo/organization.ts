@@ -10,10 +10,13 @@ import { SITE_URL } from "@/lib/constants";
 // a <script> tag should carry `@context`. Typed as the concrete
 // `OrganizationLeaf` (not the broader `Organization` union, which includes a
 // bare `string` ID-reference variant) so it stays spreadable.
+const LOGO_URL = `${SITE_URL}/brand/logo.png`;
+
 export const ORGANIZATION_REF: OrganizationLeaf = {
   "@type": "Organization",
   name: "Tidjani & Brothers",
   url: SITE_URL,
+  logo: LOGO_URL,
 };
 
 type CompanySettings = {
@@ -30,7 +33,8 @@ export function getOrganizationJsonLd(
     "@type": "LocalBusiness",
     name: "Tidjani & Brothers",
     url: SITE_URL,
-    image: `${SITE_URL}/opengraph-image`,
+    image: LOGO_URL,
+    logo: LOGO_URL,
     description:
       "Tidjani & Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money.",
     telephone: settings.phone,

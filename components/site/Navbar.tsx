@@ -9,6 +9,7 @@ import { NAV_LINKS, isNavGroup } from "@/lib/constants";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageToggle } from "@/components/site/LanguageToggle";
+import { Logo } from "@/components/site/Logo";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -53,8 +54,9 @@ export function Navbar() {
       <div className="container-max px-margin-mobile md:px-gutter flex h-20 items-center justify-between">
         <Link
           href="/"
-          className="text-headline-sm text-primary font-bold tracking-tighter"
+          className="text-headline-sm text-primary flex items-center gap-3 font-bold tracking-tighter"
         >
+          <Logo size={36} />
           Tidjani & Brothers
         </Link>
 

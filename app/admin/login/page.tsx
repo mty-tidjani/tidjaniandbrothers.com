@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ShieldCheck } from "lucide-react";
 import { LoginForm } from "@/components/forms/LoginForm";
+import { Logo } from "@/components/site/Logo";
 
 export const metadata: Metadata = {
   title: "Connexion admin",
@@ -14,6 +15,7 @@ export default function AdminLoginPage() {
       <div className="ambient-mesh" aria-hidden="true" />
       <div className="w-full max-w-md">
         <div className="mb-stack-lg text-center">
+          <Logo size={56} className="mx-auto mb-4" />
           <h1 className="text-display text-primary mb-2">Tidjani & Brothers</h1>
           <p className="text-body-lg text-on-surface-variant">Terminal Admin</p>
         </div>

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ADMIN_NAV_LINKS } from "@/lib/constants";
+import { Logo } from "@/components/site/Logo";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   dashboard: LayoutDashboard,
@@ -34,9 +35,12 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
   return (
     <nav className="border-glass-stroke bg-deep-black py-stack-md fixed top-0 left-0 hidden h-screen w-64 flex-col border-r md:flex">
       <div className="mb-stack-lg px-gutter">
-        <h1 className="text-headline-sm text-primary tracking-tighter">
-          Tidjani & Brothers
-        </h1>
+        <div className="flex items-center gap-3">
+          <Logo size={32} />
+          <h1 className="text-headline-sm text-primary tracking-tighter">
+            Tidjani & Brothers
+          </h1>
+        </div>
         <p className="text-label-caps text-on-surface-variant mt-1 tracking-widest uppercase">
           Admin Terminal
         </p>
