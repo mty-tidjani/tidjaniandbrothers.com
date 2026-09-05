@@ -3,22 +3,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: spartiat_app
+    container_name: tidjani_app
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      # Reach the db by its service name on spartiat_net instead of the
+      # Reach the db by its service name on tidjani_net instead of the
       # host-facing localhost URL in .env.
-      DATABASE_URL: postgresql://${POSTGRES_USER:-spartiat}:${POSTGRES_PASSWORD:-spartiat}@db:5432/${POSTGRES_DB:-spartiat_ai}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     ports:
       - "4141:3000"
     networks:
       - tidjani_net
 
-# spartiat_net is created by the db project's docker-compose.yml; this file
+# tidjani_net is created by the db project's docker-compose.yml; this file
 # only joins it (external: true) rather than declaring it, so `db:5432` on
-# that network resolves to the already-running spartiat_db container.
+# that network resolves to the already-running tidjani_db container.
 networks:
   tidjani_net:
     name: tidjani_net

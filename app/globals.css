@@ -2,8 +2,6 @@
 @plugin "@tailwindcss/typography";
 
 /*
- * Design tokens unified from html-template/spartiat_ai_design_system/DESIGN.md (dark)
- * and html-template/spartiat_ai_light/DESIGN.md (light). Light values live in :root,
  * dark values override under .dark (next-themes toggles that class on <html>).
  * Radius scale intentionally matches Tailwind's v4 defaults (0.25/0.5/0.75rem, full) —
  * the DESIGN.md prose asked for a different scale, but every generated mockup actually

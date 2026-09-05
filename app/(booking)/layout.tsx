@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
+import { CookieConsent } from "@/components/site/CookieConsent";
 
 export default function BookingLayout({
   children,
@@ -31,6 +32,7 @@ export default function BookingLayout({
       <main className="px-margin-mobile py-section-gap-mobile md:px-gutter md:py-section-gap-desktop flex flex-1 items-center justify-center">
         {children}
       </main>
+      <CookieConsent />
     </>
   );
 }

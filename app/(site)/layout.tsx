@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { StickyDevisButton } from "@/components/site/StickyDevisButton";
+import { CookieConsent } from "@/components/site/CookieConsent";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getOrganizationJsonLd } from "@/lib/seo/organization";
 import { getCompanySettings } from "@/lib/data/settings";
@@ -25,6 +26,7 @@ export default async function SiteLayout({
         facebookUrl={settings.facebookUrl}
       />
       <StickyDevisButton />
+      <CookieConsent />
     </>
   );
 }
