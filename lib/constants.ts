@@ -128,12 +128,12 @@ export const ROLE_LABELS: Record<string, string> = {
   EDITOR: "Éditeur (blog / portfolio)",
 };
 
-export const SITE_URL = "https://tidjaniandbrothers.com";
+export const SITE_URL = "https://tidjanibrothers.com";
 
 export const COMPANY_PHONE = "+237 6 98 96 67 19";
 export const COMPANY_PHONE_TEL = "tel:+237698966719";
-export const COMPANY_EMAIL = "contact@tidjaniandbrothers.com";
-export const COMPANY_EMAIL_MAILTO = "mailto:contact@tidjaniandbrothers.com";
+export const COMPANY_EMAIL = "contact@tidjanibrothers.com";
+export const COMPANY_EMAIL_MAILTO = "mailto:contact@tidjanibrothers.com";
 export const COMPANY_ADDRESS =
   "Awaye — près du Collège Père Monti, Yaoundé, Cameroun";
 export const COMPANY_FACEBOOK_URL = "https://www.facebook.com";

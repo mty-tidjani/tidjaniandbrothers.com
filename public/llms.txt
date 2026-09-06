@@ -10,22 +10,22 @@ Language: French (primary site content). Currency: FCFA. Service area: Cameroon.
 
 - Odoo ERP installation and support: invoicing, inventory, sales, accounting,
   CRM, point of sale, mobile money integration (MTN MoMo, Orange Money).
-  https://tidjaniandbrothers.com/services/odoo
+  https://tidjanibrothers.com/services/odoo
 - Odoo training (initial, continuing, advanced/key-user), on-site or remote.
-  https://tidjaniandbrothers.com/services/formation
+  https://tidjanibrothers.com/services/formation
 - Web design: storefront, e-commerce, portfolio, and custom sites, connected
   to the same Odoo backend when relevant.
-  https://tidjaniandbrothers.com/services/web-design
+  https://tidjanibrothers.com/services/web-design
 
 ## Key pages
 
-- Homepage: https://tidjaniandbrothers.com/
-- About: https://tidjaniandbrothers.com/about
-- Portfolio (case studies): https://tidjaniandbrothers.com/portfolio
-- Blog (Odoo & digitalization advice for Cameroonian SMEs): https://tidjaniandbrothers.com/blog
-- Contact: https://tidjaniandbrothers.com/contact
-- Book a free audit: https://tidjaniandbrothers.com/reserver-audit
-- Request a quote: https://tidjaniandbrothers.com/demande-devis
+- Homepage: https://tidjanibrothers.com/
+- About: https://tidjanibrothers.com/about
+- Portfolio (case studies): https://tidjanibrothers.com/portfolio
+- Blog (Odoo & digitalization advice for Cameroonian SMEs): https://tidjanibrothers.com/blog
+- Contact: https://tidjanibrothers.com/contact
+- Book a free audit: https://tidjanibrothers.com/reserver-audit
+- Request a quote: https://tidjanibrothers.com/demande-devis
 
 ## Notes for agents
 

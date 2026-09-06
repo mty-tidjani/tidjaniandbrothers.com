@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@tidjaniandbrothers.com";
+  const adminEmail = process.env.ADMIN_EMAIL ?? "yannick.n@tidjanibrothers.com";
   const adminPassword = process.env.ADMIN_SEED_PASSWORD;
   if (!adminPassword) {
     throw new Error(
@@ -30,7 +30,7 @@ async function main() {
     create: {
       id: "singleton",
       phone: "+237 6 98 96 67 19",
-      email: "contact@tidjaniandbrothers.com",
+      email: "contact@tidjanibrothers.com",
       address: "Awaye — près du Collège Père Monti, Yaoundé, Cameroun",
       facebookUrl: "https://www.facebook.com",
       defaultLocale: "fr",

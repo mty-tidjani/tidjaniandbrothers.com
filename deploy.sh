@@ -26,7 +26,7 @@ trap 'on_error $LINENO' ERR
 
 echo -e "${BOLD}"
 echo "┌───────────────────────────────────────┐"
-echo "│   Tidjani & Brothers — Deploy          │"
+echo "│   Tidjani & Brothers — Deploy         │"
 echo "└───────────────────────────────────────┘"
 echo -e "${RESET}"
 

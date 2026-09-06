@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "tidjaniandbrothers.com",
+      "name": "tidjanibrothers.com",
       "script": "npm",
       "args": "start",
       "cwd": ".",
