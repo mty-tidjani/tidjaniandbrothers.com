@@ -68,7 +68,7 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
           <div className="border-glass-stroke mb-stack-lg relative aspect-video w-full overflow-hidden rounded-2xl border">
             <Image
               src={study.imagePaths[0]}
-              alt={`${study.sector} — étude de cas Tidjani & Brothers`}
+              alt={`${study.sector} — étude de cas Tidjani And Brothers`}
               fill
               sizes="(min-width: 1024px) 1024px, 100vw"
               className="object-cover"

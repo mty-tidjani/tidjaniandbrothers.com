@@ -57,7 +57,7 @@ export function Navbar() {
           className="text-headline-sm text-primary flex items-center gap-3 font-bold tracking-tighter"
         >
           <Logo size={36} />
-          Tidjani & Brothers
+          T&B
         </Link>
 
         <nav
@@ -155,11 +155,6 @@ export function Navbar() {
           <div className="hidden md:block">
             <Button href="/demande-devis" variant="secondary" size="md">
               Demander un devis
-            </Button>
-          </div>
-          <div className="hidden md:block">
-            <Button href="/contact" size="md">
-              Contactez-nous
             </Button>
           </div>
           <button

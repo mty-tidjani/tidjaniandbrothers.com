@@ -14,7 +14,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Accueil",
   description:
-    "Votre entreprise mérite mieux qu'Excel. Tidjani & Brothers déploie Odoo ERP sur-mesure pour les PME camerounaises : facturation, stock, ventes, comptabilité.",
+    "Votre entreprise mérite mieux qu'Excel. Tidjani And Brothers déploie Odoo ERP sur-mesure pour les PME camerounaises : facturation, stock, ventes, comptabilité.",
   path: "/",
 });
 
@@ -183,7 +183,7 @@ export default async function HomePage() {
 
       <CTASection
         title="Prêt à moderniser votre gestion ?"
-        description="Un membre de l'équipe Tidjani & Brothers vous répond sous 24h ouvrées."
+        description="Un membre de l'équipe Tidjani And Brothers vous répond sous 24h ouvrées."
         phone={settings.phone}
         email={settings.email}
       />

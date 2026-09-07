@@ -1,6 +1,6 @@
-# Tidjani & Brothers
+# Tidjani And Brothers
 
-Marketing site + admin back-office for Tidjani & Brothers, an Odoo ERP consultancy in Yaoundé, Cameroon. Built with Next.js App Router, TypeScript, Tailwind CSS v4, Prisma/Postgres, and Auth.js.
+Marketing site + admin back-office for Tidjani And Brothers, an Odoo ERP consultancy in Yaoundé, Cameroon. Built with Next.js App Router, TypeScript, Tailwind CSS v4, Prisma/Postgres, and Auth.js.
 
 ## Getting started
 

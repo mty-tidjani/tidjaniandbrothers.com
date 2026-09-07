@@ -13,7 +13,7 @@ export default function NewBlogPostPage() {
       <header>
         <h1 className="text-headline-md text-on-surface">Nouvel article</h1>
         <p className="text-on-surface-variant mt-1">
-          Créez du contenu pour le blog Tidjani & Brothers.
+          Créez du contenu pour le blog Tidjani And Brothers.
         </p>
       </header>
       <BlogEditorForm action={createBlogPost} />

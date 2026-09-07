@@ -69,7 +69,7 @@ export default async function WebDesignServicesPage() {
           <div className="border-glass-stroke relative hidden aspect-video overflow-hidden rounded-2xl border md:block">
             <Image
               src="/uploads/services/web-design-hero.jpg"
-              alt="Exemple de site web réalisé par Tidjani & Brothers"
+              alt="Exemple de site web réalisé par Tidjani And Brothers"
               fill
               sizes="40vw"
               className="object-cover"

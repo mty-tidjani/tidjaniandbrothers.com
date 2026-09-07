@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/constants";
 
-const SITE_NAME = "Tidjani & Brothers";
+const SITE_NAME = "Tidjani And Brothers";
 
 type BuildMetadataInput = {
   title: string;

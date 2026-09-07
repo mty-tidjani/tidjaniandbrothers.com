@@ -14,7 +14,7 @@ const LOGO_URL = `${SITE_URL}/brand/logo.png`;
 
 export const ORGANIZATION_REF: OrganizationLeaf = {
   "@type": "Organization",
-  name: "Tidjani & Brothers",
+  name: "Tidjani And Brothers",
   url: SITE_URL,
   logo: LOGO_URL,
 };
@@ -31,12 +31,12 @@ export function getOrganizationJsonLd(
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    name: "Tidjani & Brothers",
+    name: "Tidjani And Brothers",
     url: SITE_URL,
     image: LOGO_URL,
     logo: LOGO_URL,
     description:
-      "Tidjani & Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money.",
+      "Tidjani And Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money.",
     telephone: settings.phone,
     email: settings.email,
     address: {

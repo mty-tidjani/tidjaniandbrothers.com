@@ -28,7 +28,7 @@ export function CaseStudyCard({
           <div className="relative aspect-video w-full overflow-hidden">
             <Image
               src={imagePath}
-              alt={`${sector} — étude de cas Tidjani & Brothers`}
+              alt={`${sector} — étude de cas Tidjani And Brothers`}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
               className="object-cover"

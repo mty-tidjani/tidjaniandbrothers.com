@@ -11,7 +11,7 @@ export async function GET(
     getPublishedCaseStudyBySlug(slug),
     getLogoDataUri(),
   ]);
-  const sector = study?.sector ?? "Tidjani & Brothers";
+  const sector = study?.sector ?? "Tidjani And Brothers";
   const result = study?.resultMetric ?? "Étude de cas";
 
   return new ImageResponse(

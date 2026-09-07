@@ -18,7 +18,7 @@ async function main() {
     where: { email: adminEmail },
     update: {},
     create: {
-      name: "Équipe Tidjani & Brothers",
+      name: "Équipe Tidjani And Brothers",
       email: adminEmail,
       passwordHash,
       role: "ADMIN",
@@ -198,7 +198,7 @@ async function main() {
       excerpt:
         "Démêler le vrai du faux. Quelle version est réellement adaptée à l'échelle de votre PME africaine ?",
       contentHtml: `<p>La digitalisation n'est plus une option pour les PME en Afrique Centrale, c'est une question de survie et de compétitivité. Face au marché des ERP, Odoo s'impose comme un acteur majeur grâce à sa flexibilité et son modèle open-source. Cependant, une question revient systématiquement lors de nos consultations : <strong>faut-il opter pour la version Community (gratuite) ou investir dans la version Enterprise ?</strong></p>
-<p>Chez Tidjani & Brothers, nous croyons en une approche chirurgicale de la technologie. Voici une analyse sans concession pour vous aider à trancher.</p>
+<p>Chez Tidjani And Brothers, nous croyons en une approche chirurgicale de la technologie. Voici une analyse sans concession pour vous aider à trancher.</p>
 <h2>L'illusion de la gratuité : le cas Community</h2>
 <p>Odoo Community est une base solide. Elle offre un accès au code source et permet de déployer des modules fondamentaux (CRM, Ventes, Facturation de base). C'est souvent le point d'entrée idéal pour une TPE ou un développeur indépendant souhaitant tester l'écosystème.</p>
 <blockquote><p>Le coût réel d'un logiciel gratuit se mesure en heures de maintenance, en compromis fonctionnels et en dette technique.</p></blockquote>
@@ -218,7 +218,7 @@ async function main() {
 </ul>
 <h2>Le verdict</h2>
 <p>Si votre chiffre d'affaires dépend de la robustesse de votre système d'information, la version Community est un risque. Le temps passé par vos équipes à contourner ses limitations ou à développer des modules sur-mesure vous coûtera infiniment plus cher que la licence Enterprise.</p>
-<p>Notre mission chez Tidjani & Brothers est de déployer des systèmes qui accélèrent votre croissance, pas qui la freinent. C'est pourquoi nous recommandons et intégrons exclusivement <strong>Odoo Enterprise</strong>, calibré sur-mesure pour les réalités de votre secteur.</p>`,
+<p>Notre mission chez Tidjani And Brothers est de déployer des systèmes qui accélèrent votre croissance, pas qui la freinent. C'est pourquoi nous recommandons et intégrons exclusivement <strong>Odoo Enterprise</strong>, calibré sur-mesure pour les réalités de votre secteur.</p>`,
       category: "ODOO",
       coverImagePath: "/uploads/blog/community-vs-enterprise.jpg",
     },

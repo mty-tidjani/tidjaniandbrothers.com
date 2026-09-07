@@ -28,7 +28,7 @@ export function PricingTier({
       )}
     >
       {featured ? (
-        <span className="bg-primary-container text-on-accent absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold tracking-wider uppercase">
+        <span className="bg-primary-container text-on-accent absolute top-0 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold tracking-wider uppercase">
           Recommandé
         </span>
       ) : null}

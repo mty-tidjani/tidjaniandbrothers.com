@@ -8,7 +8,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Contact",
   description:
-    "Contactez Tidjani & Brothers à Yaoundé pour votre projet Odoo ERP ou site web, ou réservez directement un audit gratuit de 30 minutes.",
+    "Contactez Tidjani And Brothers à Yaoundé pour votre projet Odoo ERP ou site web, ou réservez directement un audit gratuit de 30 minutes.",
   path: "/contact",
 });
 

@@ -159,6 +159,7 @@ export const NAV_LINKS: NavEntry[] = [
   { href: "/portfolio", label: "Portfolio" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "À propos" },
+  { href: "/contact", label: "Contact" },
 ];
 
 type AdminNavLink = {

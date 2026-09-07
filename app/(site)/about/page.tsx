@@ -6,7 +6,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "À propos",
   description:
-    "Fondée en 2021 à Yaoundé, Tidjani & Brothers a évolué du web design vers l'implémentation Odoo ERP pour PME camerounaises. We build IT for you.",
+    "Fondée en 2021 à Yaoundé, Tidjani And Brothers a évolué du web design vers l'implémentation Odoo ERP pour PME camerounaises. We build IT for you.",
   path: "/about",
 });
 
@@ -15,7 +15,7 @@ const TIMELINE = [
     year: "2021",
     title: "Fondation à Douala",
     description:
-      "Tidjani & Brothers démarre comme agence de web design base a Yaoundé, au service des entreprises locales.",
+      "Tidjani And Brothers démarre comme agence de web design base a Yaoundé, au service des entreprises locales.",
     image: "/uploads/about/2019-fondation-yaounde.jpg",
   },
   {
@@ -27,7 +27,7 @@ const TIMELINE = [
   },
   {
     year: "2026",
-    title: "Naissance de Tidjani & Brothers",
+    title: "Naissance de Tidjani And Brothers",
     description:
       "Rebranding et recentrage sur l'ERP pour PME locales, avec une approche bilingue et une vraie proximité client.",
     image: "/uploads/about/2026-naissance-ai.jpg",

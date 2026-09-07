@@ -58,7 +58,7 @@ export default async function OdooServicesPage() {
           Solutions <span className="text-primary">Odoo</span> sur-mesure
         </h1>
         <p className="mb-stack-lg text-body-lg text-on-surface-variant mx-auto max-w-3xl">
-          Chez Tidjani & Brothers, nous accompagnons les entreprises
+          Chez Tidjani And Brothers, nous accompagnons les entreprises
           camerounaises dans leur transition vers une gestion moderne et
           centralisée grâce à Odoo, la solution ERP tout-en-un pour PME. Vous
           démarrez de zéro&nbsp;? Nous installons et configurons votre solution

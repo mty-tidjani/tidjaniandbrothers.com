@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getLogoDataUri } from "@/lib/seo/logo-asset";
 
-export const alt = "Tidjani & Brothers — We build robust IT solutions";
+export const alt = "Tidjani And Brothers — We build robust IT solutions";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -43,7 +43,7 @@ export default async function Image() {
             display: "flex",
           }}
         >
-          Tidjani & Brothers
+          Tidjani And Brothers
         </div>
         <div
           style={{

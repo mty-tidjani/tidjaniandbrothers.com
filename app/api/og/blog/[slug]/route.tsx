@@ -12,7 +12,7 @@ export async function GET(
     getPublishedBlogPostBySlug(slug),
     getLogoDataUri(),
   ]);
-  const title = post?.title ?? "Tidjani & Brothers";
+  const title = post?.title ?? "Tidjani And Brothers";
   const category = post
     ? (BLOG_CATEGORY_LABELS[post.category] ?? post.category)
     : "Blog";
@@ -70,7 +70,7 @@ export async function GET(
             <img src={logoSrc} width={38} height={38} alt="" />
           </div>
           <div style={{ display: "flex", fontSize: 28, color: "#bbc9ca" }}>
-            Tidjani & Brothers
+            Tidjani And Brothers
           </div>
         </div>
       </div>

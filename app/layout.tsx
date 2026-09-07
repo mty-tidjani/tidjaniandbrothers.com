@@ -21,21 +21,21 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const DEFAULT_TITLE = "Tidjani & Brothers | We build robust IT solutions";
+const DEFAULT_TITLE = "Tidjani And Brothers | We build robust IT solutions";
 const DEFAULT_DESCRIPTION =
-  "Tidjani & Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money. Équipe locale à Yaoundé.";
+  "Tidjani And Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money. Équipe locale à Yaoundé.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: DEFAULT_TITLE,
-    template: "%s | Tidjani & Brothers",
+    template: "%s | Tidjani And Brothers",
   },
   description: DEFAULT_DESCRIPTION,
   openGraph: {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
-    siteName: "Tidjani & Brothers",
+    siteName: "Tidjani And Brothers",
     locale: "fr_FR",
     type: "website",
   },
@@ -43,6 +43,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
+  },
+  verification: {
+    google: "-tB6nni_Cm-eNcWwoIFNT_m_DPq2QDXojl4NckIkF60",
   },
 };
 

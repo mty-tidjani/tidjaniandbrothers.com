@@ -85,7 +85,7 @@ export function Footer({ phone, email, address, facebookUrl }: FooterProps) {
 
       <div className="container-max mt-stack-lg border-glass-stroke/50 px-margin-mobile md:px-gutter border-t pt-8">
         <p className="text-on-surface-variant text-sm">
-          © {new Date().getFullYear()} Tidjani & Brothers SARL, all rights
+          © {new Date().getFullYear()} Tidjani And Brothers SARL, all rights
           reserved.
         </p>
       </div>
