@@ -131,7 +131,7 @@ export default async function OdooServicesPage() {
       {tiers.length > 0 ? (
         <section className="container-max px-margin-mobile pb-section-gap-mobile md:px-gutter md:pb-section-gap-desktop">
           <h2 className="mb-stack-lg text-headline-md text-on-surface text-center">
-            Investissement
+            Grille Tarifaire
           </h2>
           <div className="gap-stack-lg md:gap-gutter grid grid-cols-1 items-center md:grid-cols-3">
             {tiers.map((tier) => (

@@ -58,7 +58,7 @@ export default async function WebDesignServicesPage() {
         <div className="gap-gutter grid grid-cols-1 items-center md:grid-cols-2">
           <div>
             <h1 className="text-display mb-stack-md text-on-surface">
-              Web design, <span className="text-primary">unifié avec Odoo</span>
+              Web design, <span className="text-primary">avec Tidjani & Brothers</span>
             </h1>
             <p className="text-body-lg text-on-surface-variant max-w-2xl">
               Nous gérons votre projet web aux côtés de votre déploiement Odoo,

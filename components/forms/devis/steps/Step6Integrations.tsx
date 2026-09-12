@@ -26,7 +26,7 @@ export function Step6Integrations() {
         </p>
       </div>
 
-      <FormField
+      {/* <FormField
         label="Mobile Money souhaité ?"
         htmlFor="wantsMobileMoney"
         error={errors.wantsMobileMoney?.message}
@@ -42,7 +42,7 @@ export function Step6Integrations() {
           <option value="oui">Oui</option>
           <option value="non">Non</option>
         </Select>
-      </FormField>
+      </FormField> */}
 
       <FormField
         label="Avez-vous un site e-commerce existant à connecter ?"

@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 
 const DEFAULT_TITLE = "Tidjani And Brothers | We build robust IT solutions";
 const DEFAULT_DESCRIPTION =
-  "Tidjani And Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et intégration mobile money. Équipe locale à Yaoundé.";
+  "Tidjani And Brothers accompagne les PME camerounaises dans leur transition vers Odoo ERP : installation, support et maintenance. Équipe locale à Yaoundé.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

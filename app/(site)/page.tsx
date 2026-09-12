@@ -10,6 +10,9 @@ import { CTASection } from "@/components/site/CTASection";
 import { getCompanySettings } from "@/lib/data/settings";
 import { getPublishedCaseStudies } from "@/lib/data/portfolio";
 import { buildMetadata } from "@/lib/seo";
+import { getMaintenancePlan, getServiceTiers } from "@/lib/data/services";
+import { PricingTier } from "@/components/site/PricingTier";
+import { formatPriceRange } from "@/lib/format";
 
 export const metadata: Metadata = buildMetadata({
   title: "Accueil",
@@ -60,7 +63,9 @@ const PROCESS_STEPS = [
 ];
 
 export default async function HomePage() {
-  const [settings, caseStudies] = await Promise.all([
+  const [tiers, maintenance, settings, caseStudies] = await Promise.all([
+    getServiceTiers(),
+    getMaintenancePlan(),
     getCompanySettings(),
     getPublishedCaseStudies(),
   ]);
@@ -86,8 +91,8 @@ export default async function HomePage() {
             <Button href="/demande-devis" variant="secondary" size="lg">
               Demander un devis
             </Button>
-            <Button href="/services/odoo" variant="tertiary" size="lg">
-              Voir nos services
+            <Button href="#tarifs" variant="tertiary" size="lg">
+              Voir les tarifs
             </Button>
           </div>
         </div>
@@ -124,7 +129,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container-max px-margin-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
+      {/* <section className="container-max px-margin-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
         <div className="gap-gutter grid grid-cols-1 md:grid-cols-2">
           <ServiceCard
             icon={Blocks}
@@ -140,7 +145,7 @@ export default async function HomePage() {
             href="/services/web-design"
           />
         </div>
-      </section>
+      </section> */}
 
       <section className="container-max px-margin-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
         <h2 className="mb-stack-lg text-headline-md text-on-surface text-center">
@@ -163,7 +168,50 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {featuredCaseStudy ? (
+      {tiers.length > 0 ? (
+        <section
+          id="tarifs"
+          className="container-max px-margin-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop scroll-mt-24"
+        >
+          <h2 className="mb-stack-lg text-headline-md text-on-surface text-center">
+            Grille Tarifaire
+          </h2>
+          <div className="gap-stack-lg md:gap-gutter grid grid-cols-1 items-center md:grid-cols-3">
+            {tiers.map((tier) => (
+              <PricingTier
+                key={tier.id}
+                name={tier.name}
+                priceMin={tier.priceMin}
+                priceMax={tier.priceMax}
+                features={tier.features}
+                maxUsers={tier.maxUsers}
+                featured={tier.name.toLowerCase().includes("standard")}
+              />
+            ))}
+          </div>
+
+          {maintenance ? (
+            <div className="mt-stack-lg border-glass-stroke bg-surface-container-low flex flex-col items-center justify-between gap-4 rounded-lg border p-6 md:flex-row">
+              <div>
+                <h3 className="text-headline-sm text-on-surface">
+                  {maintenance.name}
+                </h3>
+                <p className="text-on-surface-variant text-sm">
+                  Assistance continue pour votre sérénité.
+                </p>
+              </div>
+              <div className="text-headline-sm text-primary">
+                {formatPriceRange(maintenance.priceMin, maintenance.priceMax)}{" "}
+                <span className="text-on-surface-variant text-sm font-normal">
+                  FCFA / mois
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
+      {/* {featuredCaseStudy ? (
         <section className="container-max px-margin-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
           <h2 className="mb-stack-lg text-headline-md text-on-surface text-center">
             Ils nous font confiance
@@ -179,7 +227,7 @@ export default async function HomePage() {
             />
           </div>
         </section>
-      ) : null}
+      ) : null} */}
 
       <CTASection
         title="Prêt à moderniser votre gestion ?"
