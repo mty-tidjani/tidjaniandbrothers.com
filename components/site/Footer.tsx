@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Facebook, Mail, MapPin, Phone } from "lucide-react";
-import { NAV_LINKS, isNavGroup, type NavLeaf } from "@/lib/constants";
+import { NAV_LINKS, type NavLeaf } from "@/lib/constants";
 import { Logo } from "@/components/site/Logo";
 
 const FOOTER_LINKS: NavLeaf[] = [
-  ...NAV_LINKS.flatMap((entry) => (isNavGroup(entry) ? entry.children : [entry])),
+  ...NAV_LINKS,
   { href: "/demande-devis", label: "Demander un devis" },
 ];
 

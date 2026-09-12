@@ -211,7 +211,7 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* {featuredCaseStudy ? (
+      {featuredCaseStudy ? (
         <section className="container-max px-margin-mobile pt-section-gap-mobile md:px-gutter md:pt-section-gap-desktop">
           <h2 className="mb-stack-lg text-headline-md text-on-surface text-center">
             Ils nous font confiance
@@ -227,7 +227,7 @@ export default async function HomePage() {
             />
           </div>
         </section>
-      ) : null} */}
+      ) : null}
 
       <CTASection
         title="Prêt à moderniser votre gestion ?"

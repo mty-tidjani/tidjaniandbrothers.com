@@ -139,23 +139,11 @@ export const COMPANY_ADDRESS =
 export const COMPANY_FACEBOOK_URL = "https://www.facebook.com";
 
 export type NavLeaf = { href: string; label: string };
-export type NavGroup = { label: string; children: NavLeaf[] };
-export type NavEntry = NavLeaf | NavGroup;
 
-export function isNavGroup(entry: NavEntry): entry is NavGroup {
-  return "children" in entry;
-}
-
-export const NAV_LINKS: NavEntry[] = [
+export const NAV_LINKS: NavLeaf[] = [
   { href: "/", label: "Accueil" },
-  {
-    label: "Services",
-    children: [
-      { href: "/services/odoo", label: "Services Odoo" },
-      { href: "/services/formation", label: "Formation Odoo" },
-      { href: "/services/web-design", label: "Web Design" },
-    ],
-  },
+  { href: "/services/odoo", label: "Odoo ERP" },
+  { href: "/services/web-design", label: "Web Design" },
   { href: "/#tarifs", label: "Prix" },
   // { href: "/portfolio", label: "Portfolio" },
   { href: "/blog", label: "Blog" },

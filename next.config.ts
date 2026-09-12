@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
   // "Network:" URL — otherwise Next blocks it and client components (Navbar,
   // ThemeToggle) never hydrate (docs/app/api-reference/config/next-config-js/allowedDevOrigins.md).
   allowedDevOrigins: ["192.168.1.100"],
+  // Formation Odoo content was merged into /services/odoo.
+  redirects() {
+    return [
+      {
+        source: "/services/formation",
+        destination: "/services/odoo",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

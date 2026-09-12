@@ -8,11 +8,10 @@ Language: French (primary site content). Currency: FCFA. Service area: Cameroon.
 
 ## Services
 
-- Odoo ERP installation and support: invoicing, inventory, sales, accounting,
-  CRM, point of sale.
+- Odoo ERP installation, support, and training (initial, continuing,
+  advanced/key-user, on-site or remote): invoicing, inventory, sales,
+  accounting, CRM, point of sale.
   https://tidjanibrothers.com/services/odoo
-- Odoo training (initial, continuing, advanced/key-user), on-site or remote.
-  https://tidjanibrothers.com/services/formation
 - Web design: storefront, e-commerce, portfolio, and custom sites, connected
   to the same Odoo backend when relevant.
   https://tidjanibrothers.com/services/web-design
