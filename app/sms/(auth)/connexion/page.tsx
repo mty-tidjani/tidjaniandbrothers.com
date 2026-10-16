@@ -46,7 +46,7 @@ export default async function SmsLoginPage() {
             href="/sms/mot-de-passe-oublie"
             className="text-on-surface-variant hover:text-primary text-sm hover:underline"
           >
-            Mot de passe oublié ?
+            Mot de passe oublié&nbsp;?
           </Link>
         </div>
         <button type="submit" className={`${smsPrimaryButton} py-3`}>
@@ -54,7 +54,7 @@ export default async function SmsLoginPage() {
         </button>
       </ActionForm>
       <p className="text-on-surface-variant mt-6 text-center text-sm">
-        Pas encore de compte ?{" "}
+        Pas encore de compte&nbsp;?{" "}
         <Link href="/sms/inscription" className="text-primary hover:underline">
           Créer un compte
         </Link>

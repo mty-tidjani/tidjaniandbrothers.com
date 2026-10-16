@@ -128,8 +128,10 @@ export const SMS_ACCOUNT_STATUS_LABELS: Record<string, string> = {
 
 export const SMS_ACCOUNT_STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-surface-variant text-on-surface-variant border-outline-variant",
-  ACTIVE: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
-  SUSPENDED: "bg-amber-500/10 text-amber-700 dark:text-amber-500 border-amber-500/30",
+  ACTIVE:
+    "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
+  SUSPENDED:
+    "bg-amber-500/10 text-amber-700 dark:text-amber-500 border-amber-500/30",
   DISABLED: "bg-error/10 text-error border-error/30",
 };
 
@@ -148,8 +150,10 @@ export const SMS_SENDER_ID_STATUS_ORDER = [
 ] as const;
 
 export const SMS_SENDER_ID_STATUS_STYLES: Record<string, string> = {
-  PENDING_REVIEW: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30",
-  APPROVED: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
+  PENDING_REVIEW:
+    "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30",
+  APPROVED:
+    "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
   BLOCKED: "bg-error/10 text-error border-error/30",
   REJECTED: "bg-surface-variant text-on-surface-variant border-outline-variant",
 };
@@ -164,7 +168,8 @@ export const SMS_MESSAGE_STATUS_LABELS: Record<string, string> = {
 export const SMS_MESSAGE_STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-surface-variant text-on-surface-variant border-outline-variant",
   SENT: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
-  PARTIAL: "bg-amber-500/10 text-amber-700 dark:text-amber-500 border-amber-500/30",
+  PARTIAL:
+    "bg-amber-500/10 text-amber-700 dark:text-amber-500 border-amber-500/30",
   FAILED: "bg-error/10 text-error border-error/30",
 };
 
@@ -199,11 +204,12 @@ export const COMPANY_FACEBOOK_URL = "https://www.facebook.com";
 
 export type NavLeaf = { href: string; label: string };
 
+// No "Accueil" entry (the logo links home) and no generic "Prix": each
+// service page carries its own pricing (Odoo tiers, SMS packages).
 export const NAV_LINKS: NavLeaf[] = [
-  { href: "/", label: "Accueil" },
   { href: "/services/odoo", label: "Odoo ERP" },
   { href: "/services/web-design", label: "Web Design" },
-  { href: "/#tarifs", label: "Prix" },
+  { href: "/services/sms", label: "SMS Pro" },
   // { href: "/portfolio", label: "Portfolio" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "À propos" },

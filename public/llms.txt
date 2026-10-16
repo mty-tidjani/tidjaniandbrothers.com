@@ -15,6 +15,10 @@ Language: French (primary site content). Currency: FCFA. Service area: Cameroon.
 - Web design: storefront, e-commerce, portfolio, and custom sites, connected
   to the same Odoo backend when relevant.
   https://tidjanibrothers.com/services/web-design
+- Professional SMS (bulk/transactional) to MTN and Orange Cameroon with the
+  customer's own sender name, from a web dashboard or an HTTP API; prepaid
+  credit packages.
+  https://tidjanibrothers.com/services/sms
 
 ## Key pages
 
@@ -25,9 +29,11 @@ Language: French (primary site content). Currency: FCFA. Service area: Cameroon.
 - Contact: https://tidjanibrothers.com/contact
 - Book a free audit: https://tidjanibrothers.com/reserver-audit
 - Request a quote: https://tidjanibrothers.com/demande-devis
+- SMS customer sign-up: https://tidjanibrothers.com/sms/inscription
 
 ## Notes for agents
 
 - Structured data (schema.org LocalBusiness, Service, BlogPosting,
   BreadcrumbList) is embedded as JSON-LD on the relevant pages.
 - The `/admin` and `/api` paths are internal and excluded via robots.txt.
+  `/sms` (except `/sms/inscription`) is the logged-in SMS customer area.

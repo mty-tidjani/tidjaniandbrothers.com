@@ -129,7 +129,7 @@ export default async function SmsRegisterPage() {
           </button>
         </ActionForm>
         <p className="text-on-surface-variant mt-6 text-center text-sm">
-          Déjà inscrit ?{" "}
+          Déjà inscrit&nbsp;?{" "}
           <Link href="/sms/connexion" className="text-primary hover:underline">
             Se connecter
           </Link>

@@ -4,8 +4,10 @@ import { NAV_LINKS, type NavLeaf } from "@/lib/constants";
 import { Logo } from "@/components/site/Logo";
 
 const FOOTER_LINKS: NavLeaf[] = [
+  { href: "/", label: "Accueil" },
   ...NAV_LINKS,
   { href: "/demande-devis", label: "Demander un devis" },
+  { href: "/sms/connexion", label: "Espace client SMS" },
 ];
 
 type FooterProps = {

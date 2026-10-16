@@ -9,6 +9,8 @@ type PricingTierProps = {
   features: string[];
   maxUsers?: string | null;
   featured?: boolean;
+  /** Exact price text, replacing the compact range (e.g. "49 000"). */
+  priceLabel?: string;
 };
 
 export function PricingTier({
@@ -18,6 +20,7 @@ export function PricingTier({
   features,
   maxUsers,
   featured = false,
+  priceLabel,
 }: PricingTierProps) {
   return (
     <div
@@ -41,7 +44,7 @@ export function PricingTier({
         {name}
       </h3>
       <div className="text-headline-sm text-on-surface">
-        {formatPriceRange(priceMin, priceMax)}{" "}
+        {priceLabel ?? formatPriceRange(priceMin, priceMax)}{" "}
         <span className="text-on-surface-variant text-sm font-normal">
           FCFA
         </span>

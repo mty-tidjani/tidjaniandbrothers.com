@@ -393,6 +393,9 @@ Ops alerts are currently `console.error("[sms-alert] …")` in the PM2 logs
    - a message with `ê`/`ç`, which is sent as Unicode hex;
    - a 2-part message;
    - 31+ recipients, to check batching;
+   - 2 numbers where one is invalid. Does 1s2u reject the whole batch (then we refund
+     both, which is the current behaviour) or send the valid one? If it sends the valid
+     one, the response format needs checking so we bill it correctly.
    - a wrong password, to confirm the response format and that a `00` alert fires.
 4. **Negotiate the Cameroon rate** (§2.4), then update prices on `/admin/sms/pricing`.
 5. **Wire ops alerts** (`lib/notifications/sms.ts`) to email/WhatsApp, at least for

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/Input";
 import { smsPrimaryButton } from "@/components/admin/sms/buttons";
 import { sendPortalSms } from "@/lib/actions/sms-portal";
 import { MAX_PARTS, maxUnits, segment } from "@/lib/sms/segmentation";
+import { normalizeRecipient } from "@/lib/validation/sms";
 import { splitRecipients } from "@/lib/validation/sms-portal";
 
 type Sender = { id: string; value: string };
@@ -24,7 +25,11 @@ export function MessageComposer({
   const [to, setTo] = useState("");
 
   const seg = segment(message);
-  const recipients = new Set(splitRecipients(to)).size;
+  // Same normalisation + dedupe as the server, so "+237 670…" and "237670…"
+  // count once.
+  const recipients = new Set(
+    splitRecipients(to).map((n) => normalizeRecipient(n) ?? n),
+  ).size;
   // Exact for Cameroon (1 credit / SMS); the server re-prices every number.
   const estimate = recipients * (message ? seg.parts : 0);
   const tooLong = seg.parts > MAX_PARTS;

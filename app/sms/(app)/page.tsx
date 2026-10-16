@@ -103,11 +103,11 @@ export default async function SmsDashboardPage() {
       </GlassCard>
 
       <GlassCard hover={false} className="p-6">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
           <h2 className="text-headline-sm text-on-surface">Derniers envois</h2>
           <Link
             href="/sms/historique"
-            className="text-primary flex items-center gap-1 text-sm hover:underline"
+            className="text-primary flex items-center gap-1 text-sm whitespace-nowrap hover:underline"
           >
             Tout l&rsquo;historique
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -133,7 +133,10 @@ export default async function SmsDashboardPage() {
                     {m.recipients.length} dest. ·{" "}
                     {m.creditsCharged - m.creditsRefunded} cr.
                   </span>
-                  <SmsBadge kind="message" status={m.status} />
+                  {/* Rows stack on mobile; keep the badge its natural width. */}
+                  <span className="self-start sm:self-auto">
+                    <SmsBadge kind="message" status={m.status} />
+                  </span>
                 </Link>
               </li>
             ))}

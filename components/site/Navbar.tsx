@@ -36,7 +36,7 @@ export function Navbar() {
         </Link>
 
         <nav
-          className="hidden items-center gap-8 md:flex"
+          className="hidden items-center gap-6 lg:flex xl:gap-8"
           aria-label="Navigation principale"
         >
           {NAV_LINKS.map((entry) => {
@@ -63,18 +63,18 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <LanguageToggle />
           </div>
           <ThemeToggle />
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <Button href="/demande-devis" variant="secondary" size="md">
               Demander un devis
             </Button>
           </div>
           <button
             type="button"
-            className="text-primary md:hidden"
+            className="text-primary lg:hidden"
             aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
@@ -86,7 +86,7 @@ export function Navbar() {
 
       {open ? (
         <nav
-          className="border-glass-stroke bg-surface px-margin-mobile py-stack-md flex flex-col gap-1 border-t md:hidden"
+          className="border-glass-stroke bg-surface px-margin-mobile py-stack-md flex flex-col gap-1 border-t lg:hidden"
           aria-label="Navigation mobile"
         >
           {NAV_LINKS.map((entry) => (

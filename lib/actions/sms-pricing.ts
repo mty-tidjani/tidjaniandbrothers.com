@@ -62,5 +62,7 @@ export async function saveSmsPackage(
   else await prisma.smsPackage.create({ data });
 
   revalidatePath("/admin/sms/pricing");
+  // Public price list.
+  revalidatePath("/services/sms");
   return { success: "Forfait enregistré" };
 }

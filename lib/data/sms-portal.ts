@@ -84,19 +84,33 @@ export type PortalMessageFilters = {
 const STATUSES = ["PENDING", "SENT", "PARTIAL", "FAILED"];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+/**
+ * Messages of this account with a recipient containing `digits` anywhere,
+ * so "650000003" finds "237650000003". Prisma can only match whole array
+ * elements, hence the raw query. `digits` is \d+ only: no LIKE wildcards.
+ */
+async function idsMatchingNumber(accountId: string, digits: string) {
+  const rows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT id FROM "SmsMessage"
+    WHERE "accountId" = ${accountId}
+      AND array_to_string(recipients, ',') LIKE ${`%${digits}%`}
+  `;
+  return rows.map((r) => r.id);
+}
+
 /** `from`/`to` are inclusive local (Douala, UTC+1) days. */
-function messageWhere(
+async function messageWhere(
   accountId: string,
   filters: PortalMessageFilters,
-): Prisma.SmsMessageWhereInput {
+): Promise<Prisma.SmsMessageWhereInput> {
+  // Stored numbers are normalised digits, so match on digits only.
   const digits = filters.q?.replace(/\D/g, "");
   return {
     accountId,
     status: STATUSES.includes(filters.status ?? "")
       ? (filters.status as SmsMessageStatus)
       : undefined,
-    // Stored numbers are normalised digits, so match on digits only.
-    recipients: digits ? { has: digits } : undefined,
+    id: digits ? { in: await idsMatchingNumber(accountId, digits) } : undefined,
     createdAt:
       (filters.from && DATE_RE.test(filters.from)) ||
       (filters.to && DATE_RE.test(filters.to))
@@ -122,7 +136,7 @@ export async function getPortalMessages(
   filters: PortalMessageFilters,
   page: number,
 ) {
-  const where = messageWhere(accountId, filters);
+  const where = await messageWhere(accountId, filters);
   const [items, total] = await Promise.all([
     prisma.smsMessage.findMany({
       where,
@@ -146,7 +160,7 @@ export async function getPortalMessagesForExport(
   filters: PortalMessageFilters,
 ) {
   return prisma.smsMessage.findMany({
-    where: messageWhere(accountId, filters),
+    where: await messageWhere(accountId, filters),
     orderBy: { createdAt: "desc" },
     take: EXPORT_LIMIT,
   });
