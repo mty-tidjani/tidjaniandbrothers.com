@@ -75,8 +75,9 @@ priced.
 - Every package has the same price per credit, so no package ever goes below +50%. A
   volume discount on Business/Pro would cut into that.
 - The pricing page recalculates margins live and flags any package that loses money.
-- `npm run db:seed` only creates these rows if they don't exist yet; it never
-  overwrites prices edited in the admin.
+- The seed only fills **empty** tables, and `deploy.sh` runs it on every deploy.
+  These prices are created on the first deploy with the SMS tables, and never
+  overwritten after that: edit them at `/admin/sms/pricing`.
 
 ### 2.4 The rate to negotiate
 
@@ -380,10 +381,10 @@ Ops alerts are currently `console.error("[sms-alert] …")` in the PM2 logs
 
 ## 9. Before launch
 
-1. **Apply the migration and seed.** On deploy, `deploy.sh` runs
-   `prisma migrate deploy`; run `npm run db:seed` once to create the rate row and
-   packages. The migration was generated with `prisma migrate diff` (the local DB login
-   was rejected), so run `npx prisma migrate dev` against a dev database first.
+1. **Apply the migration and seed.** `deploy.sh` does both: `prisma migrate deploy`,
+   then the seed, which fills only empty tables (here, the SMS rate and packages). The
+   migrations were generated with `prisma migrate diff` (the local DB login was
+   rejected), so run `npx prisma migrate dev` against a dev database first.
 2. **Set `SMS_PROVIDER_USERNAME` / `SMS_PROVIDER_PASSWORD`** on the server.
 3. **Test against live 1s2u** with a test account, our own SID and our own number:
    - a plain message (`mt=0`);

@@ -31,7 +31,9 @@ Marketing site + admin back-office for Tidjani And Brothers, an Odoo ERP consult
    npx prisma db seed
    ```
 
-   This creates the admin user (`ADMIN_EMAIL` / `ADMIN_SEED_PASSWORD`), the Odoo pricing tiers, the real case study + two clearly TODO-marked placeholders, and the five planned blog posts.
+   This creates the admin user (`ADMIN_EMAIL` / `ADMIN_SEED_PASSWORD`), the Odoo pricing tiers, the real case study + two clearly TODO-marked placeholders, the five planned blog posts, and the SMS rate + packages.
+
+   The seed **only fills empty tables**: a table that already has rows is skipped, so it never overwrites anything edited in the admin. `deploy.sh` runs it on every deploy (after `prisma migrate deploy`), which is how new tables like the SMS ones get their first data. `ADMIN_SEED_PASSWORD` is only needed when there is no user yet.
 
 5. **Run the dev server**
 
@@ -71,4 +73,4 @@ Marketing site + admin back-office for Tidjani And Brothers, an Odoo ERP consult
 
 - `npm run dev` / `npm run build` / `npm run start`
 - `npm run lint`
-- `npm run db:seed` — re-run the seed script directly
+- `npm run db:seed` — re-run the seed script directly (safe: only fills empty tables)

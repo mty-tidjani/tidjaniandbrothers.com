@@ -4,39 +4,65 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+/**
+ * Runs on every deploy (deploy.sh), so it only ever fills EMPTY tables: once
+ * a table has any row, it's owned by the admin UI and never touched again.
+ * To change existing data, edit it in /admin — not here.
+ */
+async function seedIfEmpty(
+  table: string,
+  count: () => Promise<number>,
+  seed: () => Promise<unknown>,
+) {
+  const rows = await count();
+  if (rows > 0) {
+    console.log(`- ${table}: ${rows} row(s), skipped`);
+    return;
+  }
+  await seed();
+  console.log(`- ${table}: seeded`);
+}
+
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL ?? "yannick.n@tidjanibrothers.com";
-  const adminPassword = process.env.ADMIN_SEED_PASSWORD;
-  if (!adminPassword) {
-    throw new Error(
-      "ADMIN_SEED_PASSWORD is not set — refusing to seed with a default password",
-    );
-  }
 
-  const passwordHash = await bcrypt.hash(adminPassword, 12);
-  const admin = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      name: "Équipe Tidjani And Brothers",
-      email: adminEmail,
-      passwordHash,
-      role: "ADMIN",
+  await seedIfEmpty(
+    "User",
+    () => prisma.user.count(),
+    async () => {
+      // Only needed for the very first deploy, when there's no admin yet.
+      const adminPassword = process.env.ADMIN_SEED_PASSWORD;
+      if (!adminPassword) {
+        throw new Error(
+          "ADMIN_SEED_PASSWORD is not set — refusing to create the first admin with a default password",
+        );
+      }
+      await prisma.user.create({
+        data: {
+          name: "Équipe Tidjani And Brothers",
+          email: adminEmail,
+          passwordHash: await bcrypt.hash(adminPassword, 12),
+          role: "ADMIN",
+        },
+      });
     },
-  });
+  );
 
-  await prisma.companySettings.upsert({
-    where: { id: "singleton" },
-    update: {},
-    create: {
-      id: "singleton",
-      phone: "+237 6 98 96 67 19",
-      email: "contact@tidjanibrothers.com",
-      address: "Awaye — près du Collège Père Monti, Yaoundé, Cameroun",
-      facebookUrl: "https://www.facebook.com",
-      defaultLocale: "fr",
-    },
-  });
+  await seedIfEmpty(
+    "CompanySettings",
+    () => prisma.companySettings.count(),
+    () =>
+      prisma.companySettings.create({
+        data: {
+          id: "singleton",
+          phone: "+237 6 98 96 67 19",
+          email: "contact@tidjanibrothers.com",
+          address: "Awaye — près du Collège Père Monti, Yaoundé, Cameroun",
+          facebookUrl: "https://www.facebook.com",
+          defaultLocale: "fr",
+        },
+      }),
+  );
 
   const tiers: Array<{
     name: string;
@@ -96,26 +122,14 @@ async function main() {
     },
   ];
 
-  for (const tier of tiers) {
-    const existing = await prisma.serviceTier.findFirst({
-      where: { name: tier.name },
-    });
-    if (existing) {
-      await prisma.serviceTier.update({
-        where: { id: existing.id },
-        data: tier,
-      });
-    } else {
-      await prisma.serviceTier.create({ data: tier });
-    }
-  }
+  await seedIfEmpty(
+    "ServiceTier",
+    () => prisma.serviceTier.count(),
+    () => prisma.serviceTier.createMany({ data: tiers }),
+  );
 
-  await prisma.caseStudy.upsert({
-    where: { slug: "commerce-detail-yaounde" },
-    update: {
-      imagePaths: ["/uploads/case-studies/commerce-detail-yaounde.jpg"],
-    },
-    create: {
+  const caseStudies = [
+    {
       slug: "commerce-detail-yaounde",
       sector: "Commerce de détail, Yaoundé",
       before:
@@ -126,30 +140,27 @@ async function main() {
       imagePaths: ["/uploads/case-studies/commerce-detail-yaounde.jpg"],
       published: true,
     },
-  });
-
-  // Real card structure kept identical to the first case study on purpose —
-  // these are explicit placeholders for real client data, not fabricated results.
-  const placeholderStudies = [
-    { slug: "etude-de-cas-2", sector: "[Secteur à préciser], [Ville]" },
-    { slug: "etude-de-cas-3", sector: "[Secteur à préciser], [Ville]" },
+    // Real card structure kept identical to the first case study on purpose —
+    // these are explicit placeholders for real client data, not fabricated results.
+    ...[
+      { slug: "etude-de-cas-2", sector: "[Secteur à préciser], [Ville]" },
+      { slug: "etude-de-cas-3", sector: "[Secteur à préciser], [Ville]" },
+    ].map((study) => ({
+      ...study,
+      before:
+        "[TODO: décrire la situation manuelle ou déconnectée avant l'intervention]",
+      after:
+        "[TODO: décrire la solution Odoo déployée et les résultats mesurés]",
+      imagePaths: [],
+      published: false,
+    })),
   ];
-  for (const study of placeholderStudies) {
-    await prisma.caseStudy.upsert({
-      where: { slug: study.slug },
-      update: {},
-      create: {
-        slug: study.slug,
-        sector: study.sector,
-        before:
-          "[TODO: décrire la situation manuelle ou déconnectée avant l'intervention]",
-        after:
-          "[TODO: décrire la solution Odoo déployée et les résultats mesurés]",
-        imagePaths: [],
-        published: false,
-      },
-    });
-  }
+
+  await seedIfEmpty(
+    "CaseStudy",
+    () => prisma.caseStudy.count(),
+    () => prisma.caseStudy.createMany({ data: caseStudies }),
+  );
 
   const blogPosts: Array<{
     title: string;
@@ -235,18 +246,27 @@ async function main() {
     },
   ];
 
-  for (const post of blogPosts) {
-    await prisma.blogPost.upsert({
-      where: { slug: post.slug },
-      update: post,
-      create: {
-        ...post,
-        status: "PUBLISHED",
-        authorId: admin.id,
-        publishedAt: new Date(),
-      },
-    });
-  }
+  await seedIfEmpty(
+    "BlogPost",
+    () => prisma.blogPost.count(),
+    async () => {
+      // The seeded admin if it exists, otherwise any admin.
+      const author =
+        (await prisma.user.findUnique({ where: { email: adminEmail } })) ??
+        (await prisma.user.findFirstOrThrow({
+          where: { role: "ADMIN" },
+          orderBy: { createdAt: "asc" },
+        }));
+      await prisma.blogPost.createMany({
+        data: blogPosts.map((post) => ({
+          ...post,
+          status: "PUBLISHED" as const,
+          authorId: author.id,
+          publishedAt: new Date(),
+        })),
+      });
+    },
+  );
 
   // SMS reselling — see SMS.md §2. 1s2u's public price list
   // (1s2u.com/pricing): Standard $0.10/SMS, High Quality $0.11/SMS. We price
@@ -257,16 +277,19 @@ async function main() {
   const smsCostFcfa = Math.ceil(SMS_UPSTREAM_USD * USD_TO_FCFA); // 65
   const smsPricePerCredit = Math.ceil(smsCostFcfa * (1 + SMS_PROFIT_MARKUP)); // 98
 
-  await prisma.smsRateCard.upsert({
-    where: { prefix: "237" },
-    update: {},
-    create: {
-      prefix: "237",
-      label: "Cameroun (MTN, Orange)",
-      upstreamCostFcfa: smsCostFcfa,
-      creditsPerPart: 1,
-    },
-  });
+  await seedIfEmpty(
+    "SmsRateCard",
+    () => prisma.smsRateCard.count(),
+    () =>
+      prisma.smsRateCard.create({
+        data: {
+          prefix: "237",
+          label: "Cameroun (MTN, Orange)",
+          upstreamCostFcfa: smsCostFcfa,
+          creditsPerPart: 1,
+        },
+      }),
+  );
 
   // Same price per credit in every package; they differ only in size.
   const smsPackages = [
@@ -274,12 +297,11 @@ async function main() {
     { name: "Business", credits: 2_500, sortOrder: 2 },
     { name: "Pro", credits: 10_000, sortOrder: 3 },
   ].map((pkg) => ({ ...pkg, priceFcfa: pkg.credits * smsPricePerCredit }));
-  for (const pkg of smsPackages) {
-    const existing = await prisma.smsPackage.findFirst({
-      where: { name: pkg.name },
-    });
-    if (!existing) await prisma.smsPackage.create({ data: pkg });
-  }
+  await seedIfEmpty(
+    "SmsPackage",
+    () => prisma.smsPackage.count(),
+    () => prisma.smsPackage.createMany({ data: smsPackages }),
+  );
 
   console.log("Seed complete.");
 }

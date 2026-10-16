@@ -42,6 +42,11 @@ step "Running database migrations"
 npx prisma migrate deploy
 log "Migrations applied"
 
+step "Seeding empty tables"
+# Only fills tables that have no rows yet; never overwrites (prisma/seed.ts).
+npm run db:seed
+log "Seed done"
+
 step "Building application"
 npm run build
 log "Build complete"
