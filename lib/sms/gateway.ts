@@ -1,6 +1,5 @@
 import type { SmsMessage } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { SmsCaller } from "@/lib/sms/auth";
 import {
   sendViaUpstream,
   UPSTREAM_MAX_RECIPIENTS,
@@ -22,6 +21,18 @@ import { normalizeRecipient, type SendSmsInput } from "@/lib/validation/sms";
 // Upstream codes worth one immediate retry. NETWORK is deliberately absent:
 // a timeout may still have been delivered, and a retry would double-send.
 const RETRY_NOW = new Set(["0000", "HTTP_429"]);
+
+/**
+ * Who is sending. Built from an API key (public API) or from a portal
+ * session (web form, `apiKeyId: null`). Callers must have already checked
+ * that the sender ID is APPROVED and belongs to the account; the credit
+ * debit below re-checks that the account is ACTIVE.
+ */
+export type SendContext = {
+  accountId: string;
+  apiKeyId: string | null;
+  senderId: { id: string; value: string };
+};
 
 type BatchRecord = {
   recipients: string[];
@@ -103,7 +114,7 @@ function prepare(input: SendSmsInput) {
   return { recipients, segmentation };
 }
 
-export async function sendSms(caller: SmsCaller, input: SendSmsInput) {
+export async function sendSms(caller: SendContext, input: SendSmsInput) {
   const { recipients, segmentation } = prepare(input);
 
   const priced = quote(recipients, segmentation.parts, await getActiveRates());
@@ -119,8 +130,8 @@ export async function sendSms(caller: SmsCaller, input: SendSmsInput) {
   const message = await prisma.$transaction(async (tx) => {
     const created = await tx.smsMessage.create({
       data: {
-        accountId: caller.account.id,
-        apiKeyId: caller.id,
+        accountId: caller.accountId,
+        apiKeyId: caller.apiKeyId,
         senderIdId: caller.senderId.id,
         senderValue: caller.senderId.value,
         recipients,
@@ -131,7 +142,7 @@ export async function sendSms(caller: SmsCaller, input: SendSmsInput) {
       },
     });
     const balance = await applyCreditChange(tx, {
-      accountId: caller.account.id,
+      accountId: caller.accountId,
       credits: -priced.credits,
       type: "DEBIT",
       messageId: created.id,
@@ -187,7 +198,7 @@ export async function sendSms(caller: SmsCaller, input: SendSmsInput) {
   const updated = await prisma.$transaction(async (tx) => {
     if (refund > 0) {
       await applyCreditChange(tx, {
-        accountId: caller.account.id,
+        accountId: caller.accountId,
         credits: refund,
         type: "REFUND",
         messageId: message.id,
@@ -210,14 +221,14 @@ export async function sendSms(caller: SmsCaller, input: SendSmsInput) {
   await handleUpstreamFailures(caller, message.id, records);
 
   const { creditBalance } = await prisma.smsAccount.findUniqueOrThrow({
-    where: { id: caller.account.id },
+    where: { id: caller.accountId },
     select: { creditBalance: true },
   });
   return { message: updated, balance: creditBalance };
 }
 
 async function handleUpstreamFailures(
-  caller: SmsCaller,
+  caller: SendContext,
   messageId: string,
   records: BatchRecord[],
 ) {
@@ -231,7 +242,7 @@ async function handleUpstreamFailures(
       await notifySmsOpsAlert({
         upstreamCode: code,
         description: info.description,
-        accountId: caller.account.id,
+        accountId: caller.accountId,
         messageId,
       });
     }

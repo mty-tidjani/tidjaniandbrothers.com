@@ -12,3 +12,16 @@ export async function notifySmsOpsAlert(alert: {
     `[sms-alert] 1s2u ${alert.upstreamCode}: ${alert.description} (compte ${alert.accountId}, message ${alert.messageId})`,
   );
 }
+
+// STUB — same as above: tell the sales team a customer signed up from the
+// portal and is waiting for activation + a first recharge.
+export async function notifySmsSignup(account: {
+  id: string;
+  companyName: string;
+  contactEmail: string;
+  contactPhone: string;
+}): Promise<void> {
+  console.info(
+    `[sms-signup] Nouveau compte SMS en attente : ${account.companyName} (${account.contactEmail}, ${account.contactPhone}) — /admin/sms/${account.id}`,
+  );
+}

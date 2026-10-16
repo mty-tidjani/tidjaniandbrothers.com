@@ -128,8 +128,8 @@ export const SMS_ACCOUNT_STATUS_LABELS: Record<string, string> = {
 
 export const SMS_ACCOUNT_STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-surface-variant text-on-surface-variant border-outline-variant",
-  ACTIVE: "bg-green-500/10 text-green-400 border-green-500/30",
-  SUSPENDED: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+  ACTIVE: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
+  SUSPENDED: "bg-amber-500/10 text-amber-700 dark:text-amber-500 border-amber-500/30",
   DISABLED: "bg-error/10 text-error border-error/30",
 };
 
@@ -148,8 +148,8 @@ export const SMS_SENDER_ID_STATUS_ORDER = [
 ] as const;
 
 export const SMS_SENDER_ID_STATUS_STYLES: Record<string, string> = {
-  PENDING_REVIEW: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
-  APPROVED: "bg-green-500/10 text-green-400 border-green-500/30",
+  PENDING_REVIEW: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30",
+  APPROVED: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
   BLOCKED: "bg-error/10 text-error border-error/30",
   REJECTED: "bg-surface-variant text-on-surface-variant border-outline-variant",
 };
@@ -163,8 +163,8 @@ export const SMS_MESSAGE_STATUS_LABELS: Record<string, string> = {
 
 export const SMS_MESSAGE_STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-surface-variant text-on-surface-variant border-outline-variant",
-  SENT: "bg-green-500/10 text-green-400 border-green-500/30",
-  PARTIAL: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+  SENT: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30",
+  PARTIAL: "bg-amber-500/10 text-amber-700 dark:text-amber-500 border-amber-500/30",
   FAILED: "bg-error/10 text-error border-error/30",
 };
 
@@ -190,6 +190,7 @@ export const SITE_URL = "https://tidjanibrothers.com";
 
 export const COMPANY_PHONE = "+237 6 98 96 67 19";
 export const COMPANY_PHONE_TEL = "tel:+237698966719";
+export const COMPANY_WHATSAPP_URL = "https://wa.me/237698966719";
 export const COMPANY_EMAIL = "contact@tidjanibrothers.com";
 export const COMPANY_EMAIL_MAILTO = "mailto:contact@tidjanibrothers.com";
 export const COMPANY_ADDRESS =

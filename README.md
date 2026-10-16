@@ -48,6 +48,7 @@ Marketing site + admin back-office for Tidjani And Brothers, an Odoo ERP consult
 - `app/(booking)` — the standalone 2-step "réserver un audit" flow and its confirmation screen
 - `app/admin` — authenticated back-office (leads, blog, portfolio, services & pricing, SMS, team, settings)
 - `app/api/sms/v1` — public, API-key-authenticated SMS API we resell on top of 1s2u (see `SMS.md`)
+- `app/sms` — SMS customer portal (signup, dashboard, history, credits, keys); own session system, separate from admin Auth.js
 - `lib/sms` — SMS gateway core: 1s2u client, auth, pricing, credits ledger, rate limiting
 - `components/ui` — shared primitives used by both the public site and admin
 - `components/site`, `components/admin`, `components/forms` — feature components
@@ -62,6 +63,7 @@ Marketing site + admin back-office for Tidjani And Brothers, an Odoo ERP consult
 - **File uploads are placeholder text fields**, not a real upload pipeline. Blog cover images and case study images accept a path string; wiring an actual upload (to `public/uploads` locally, or object storage in production) is still open. `public/uploads` won't persist on ephemeral/serverless hosts like Vercel — needs external storage before a real deploy.
 - **Language toggle is visual only.** Content is French-only for now (matches the original brief's scope); the EN side of the toggle is a disabled label, not a working locale switch.
 - **SMS credit top-ups are manual.** There's no payment processor: an admin records each payment (mobile money / bank transfer) from `/admin/sms/[id]`, which credits the account. SMS ops alerts (1s2u credentials invalid, our 1s2u balance empty) are logged with `console.error("[sms-alert] ...")` rather than sent anywhere — see `lib/notifications/sms.ts`.
+- **SMS portal password resets go through support.** With no email provider, customers ask us, and an admin generates a single-use link from `/admin/sms/[id]` ("Accès Espace SMS").
 - **SMS rate limits are in-process**, which is only correct while PM2 runs a single instance (`process.json`). Scaling out needs a shared store.
 - **Portfolio ships with 1 real case study + 2 unpublished TODO placeholders** rather than fabricated client data, per the brief.
 

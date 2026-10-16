@@ -26,7 +26,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const { message, balance } = await sendSms(caller, parsed.data);
+    const { message, balance } = await sendSms(
+      {
+        accountId: caller.account.id,
+        apiKeyId: caller.id,
+        senderId: caller.senderId,
+      },
+      parsed.data,
+    );
     const payload = { ...toApiMessage(message), balance };
 
     if (message.status === "FAILED") {

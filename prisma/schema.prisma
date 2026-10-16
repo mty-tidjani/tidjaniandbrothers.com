@@ -286,6 +286,7 @@ model SmsAccount {
   messages     SmsMessage[]
   transactions SmsCreditTransaction[]
   statusEvents SmsAccountStatusEvent[]
+  portalUsers  SmsPortalUser[]
 
   @@index([status])
 }
@@ -442,4 +443,54 @@ model SmsPackage {
   updatedAt DateTime @updatedAt
 
   transactions SmsCreditTransaction[]
+}
+
+// ---------------------------------------------------------------------------
+// SMS customer portal (/sms). Deliberately separate from `User` and Auth.js:
+// a customer session must never be able to satisfy the /admin checks.
+// ---------------------------------------------------------------------------
+
+model SmsPortalUser {
+  id           String    @id @default(cuid())
+  accountId    String
+  name         String
+  // Stored lowercased.
+  email        String    @unique
+  // Null until the user sets one from an admin-issued access link.
+  passwordHash String?
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  account  SmsAccount         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  sessions SmsPortalSession[]
+  tokens   SmsPortalToken[]
+
+  @@index([accountId])
+}
+
+model SmsPortalSession {
+  id        String   @id @default(cuid())
+  userId    String
+  // SHA-256 of the cookie value.
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user SmsPortalUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Single-use "set your password" link, used both for first access and for
+// resets. Issued by an admin (no email provider yet).
+model SmsPortalToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user SmsPortalUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

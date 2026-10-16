@@ -11,12 +11,14 @@ import {
   Wallet,
   ShieldAlert,
   History,
+  UserRound,
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ActionForm } from "@/components/admin/sms/ActionForm";
 import { IssueApiKeyForm } from "@/components/admin/sms/IssueApiKeyForm";
+import { PortalAccessForm } from "@/components/admin/sms/PortalAccessForm";
 import { SenderIdActions } from "@/components/admin/sms/SenderIdActions";
 import { SmsBadge } from "@/components/admin/sms/SmsBadge";
 import { SmsEventTimeline } from "@/components/admin/sms/SmsEventTimeline";
@@ -38,7 +40,7 @@ import {
   updateSmsAccountStatus,
 } from "@/lib/actions/sms-accounts";
 import { createSenderId } from "@/lib/actions/sms-sender-ids";
-import { revokeApiKey } from "@/lib/actions/sms-api-keys";
+import { issueApiKey, revokeApiKey } from "@/lib/actions/sms-api-keys";
 
 export const metadata: Metadata = {
   title: "Compte SMS",
@@ -213,7 +215,10 @@ export default async function SmsAccountDetailPage({ params }: PageProps) {
                               Révoquée
                             </span>
                           ) : (
-                            <ActionForm action={revokeApiKey}>
+                            <ActionForm
+                              action={revokeApiKey}
+                              confirmMessage="Révoquer cette clé ? Les envois qui l'utilisent cesseront immédiatement."
+                            >
                               <input
                                 type="hidden"
                                 name="keyId"
@@ -232,6 +237,7 @@ export default async function SmsAccountDetailPage({ params }: PageProps) {
               </div>
             ) : null}
             <IssueApiKeyForm
+              action={issueApiKey}
               senders={keySenders.map((s) => ({
                 id: s.id,
                 value: s.value,
@@ -482,6 +488,38 @@ export default async function SmsAccountDetailPage({ params }: PageProps) {
                 Ajuster
               </button>
             </ActionForm>
+          </GlassCard>
+
+          <GlassCard hover={false} className="p-6">
+            <h2 className={sectionTitle}>
+              <UserRound className="text-primary h-5 w-5" aria-hidden="true" />
+              Accès Espace SMS
+            </h2>
+            {account.portalUsers.length === 0 ? (
+              <p className="text-on-surface-variant mb-4 text-sm">
+                Le client n&rsquo;a pas encore d&rsquo;accès à l&rsquo;espace
+                client (/sms).
+              </p>
+            ) : (
+              <ul className="mb-4 space-y-2 text-sm">
+                {account.portalUsers.map((u) => (
+                  <li key={u.id}>
+                    <p className="text-on-surface font-medium">{u.email}</p>
+                    <p className="text-on-surface-variant">
+                      {u.passwordHash
+                        ? u.lastLoginAt
+                          ? `Dernière connexion : ${formatDateTime(u.lastLoginAt)}`
+                          : "Jamais connecté"
+                        : "Mot de passe pas encore défini"}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <PortalAccessForm
+              accountId={account.id}
+              hasPassword={account.portalUsers.some((u) => u.passwordHash)}
+            />
           </GlassCard>
 
           <GlassCard hover={false} className="p-6">

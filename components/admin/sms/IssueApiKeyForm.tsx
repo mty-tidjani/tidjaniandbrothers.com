@@ -4,20 +4,29 @@ import { useActionState, useState } from "react";
 import { Copy, Check, KeyRound } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { issueApiKey } from "@/lib/actions/sms-api-keys";
+import type { ActionState } from "@/lib/sms/admin";
 import { smsPrimaryButton } from "@/components/admin/sms/buttons";
 
 type SenderOption = { id: string; value: string; status: string };
 
-export function IssueApiKeyForm({ senders }: { senders: SenderOption[] }) {
-  const [state, formAction, pending] = useActionState(issueApiKey, {});
+/** Used by the admin (issueApiKey) and the customer portal (createPortalApiKey). */
+export function IssueApiKeyForm({
+  senders,
+  action,
+  emptyMessage,
+}: {
+  senders: SenderOption[];
+  action: (prev: ActionState, formData: FormData) => Promise<ActionState>;
+  emptyMessage?: string;
+}) {
+  const [state, formAction, pending] = useActionState(action, {});
   const [copied, setCopied] = useState(false);
 
   if (senders.length === 0) {
     return (
       <p className="text-on-surface-variant text-sm">
-        Ajoutez d&rsquo;abord un nom d&rsquo;expéditeur : chaque clé est liée à
-        un seul expéditeur.
+        {emptyMessage ??
+          "Ajoutez d'abord un nom d'expéditeur : chaque clé est liée à un seul expéditeur."}
       </p>
     );
   }

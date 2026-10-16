@@ -47,6 +47,16 @@ export async function getSmsAccountById(id: string) {
         },
       },
       messages: { orderBy: { createdAt: "desc" }, take: 25 },
+      portalUsers: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          lastLoginAt: true,
+          passwordHash: true,
+        },
+      },
     },
   });
 }

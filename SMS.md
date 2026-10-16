@@ -1,6 +1,6 @@
 # SMS Reselling Service
 
-Status: **v1 implemented**. Migration not yet applied to a database, and not yet tested
+Status: **v1 implemented, including the customer portal (§5b)**. Migration not yet applied to a database, and not yet tested
 against the live 1s2u API (see §9 before launch).
 
 Upstream provider: **1s2u** (`https://api.1s2u.io/bulksms`), HTTP GET, one-way SMS
@@ -152,13 +152,20 @@ which stays staff-only.
 
 ### Onboarding a customer
 
-1. `/admin/sms` → **Nouveau compte client** (the account starts as `PENDING`).
-2. On the account page: **Ajouter un expéditeur** → approve it once it's cleared with
-   1s2u/carriers.
-3. **Enregistrer un paiement**: pick the package they paid for (or a custom amount),
-   with the payment reference.
-4. **Générer** an API key for that SID and send it to the customer securely.
-5. Set the status to **Activer**.
+The customer can sign up at `/sms/inscription`, or an admin creates the account at
+`/admin/sms`. Either way:
+
+1. The account starts as `PENDING`. A self-signup logs `[sms-signup] …` server-side.
+2. **Sender name**: the customer requests it from the portal, or an admin adds it.
+   Approve it at `/admin/sms/senders` once it's cleared with 1s2u/carriers.
+3. **Enregistrer un paiement**: once the customer has paid by Mobile Money or bank
+   transfer, pick the package they paid for (or a custom amount) and add the payment
+   reference.
+4. Set the status to **Activer**.
+5. The customer creates their own API keys in the portal. An admin can still issue one
+   from the account page.
+6. Admin-created accounts only: **Accès Espace SMS → Générer un lien d'accès**, and
+   send the link to the customer.
 
 ---
 
@@ -181,12 +188,55 @@ Manual adjustments (either sign) need a reason and can't take a balance below ze
 
 ---
 
+## 5b. Customer portal (`/sms`)
+
+The portal is a self-service space for customers. Admins still do every recharge
+manually; there's no payment provider.
+
+| Page | What the customer can do |
+|---|---|
+| `/sms/inscription`, `/sms/connexion` | sign up (the account starts `PENDING`), log in |
+| `/sms` | see their balance, 30-day stats, a daily usage chart and their latest sends |
+| `/sms/envoyer` | send from the web: live character/SMS counter, cost estimate, up to 300 numbers |
+| `/sms/historique` | browse every send: filter by status, number and date; paginated; CSV export |
+| `/sms/historique/[id]` | see one send: per-batch result with a plain-French error |
+| `/sms/credits` | see their balance, the price list, the full credit ledger, and WhatsApp/phone/email links to request a recharge |
+| `/sms/expediteurs` | request sender names (max 3 pending, 10 total) and see their status and reason |
+| `/sms/cles-api` | create keys (only for approved names, max 10 active), see last use, revoke |
+| `/sms/documentation` | read the API reference with curl, JavaScript and PHP examples |
+| `/sms/compte` | edit contact name/phone, change password (signs out other devices) |
+
+**Auth is separate from staff Auth.js by design.** The admin layout lets in *any*
+Auth.js session, so a customer signed in through Auth.js would get into `/admin`.
+Portal sessions are their own `SmsPortalSession` rows: a random token in an httpOnly
+`tb_sms_session` cookie, SHA-256 hashed in the DB, valid 30 days.
+
+- Every portal page and action calls `requirePortalSession()` and scopes its queries
+  to that session's account id. A layout check alone isn't enough, because layouts
+  don't re-run on client-side navigation.
+- **Account status is re-read on every request.**
+  - `DISABLED` logs the customer out.
+  - `SUSPENDED` can log in and read history, but can't send or create keys.
+  - `PENDING` can log in, request sender names and see prices.
+- Login allows 8 failed attempts per email per 15 minutes (in-process). bcrypt runs even
+  for unknown emails, so response timing doesn't reveal which emails exist.
+- **Passwords without email.** "Mot de passe oublié" sends the customer to support
+  (WhatsApp/phone/email). The admin clicks **Lien de réinitialisation** on the account
+  page and sends the link. The link is single-use and valid 7 days; issuing a new one
+  invalidates the previous one. Using it signs out every session.
+- Sends from the web form go through the same `sendSms()` as the API, so billing,
+  refunds and limits are identical. They're recorded with `apiKeyId = null`, which the
+  message detail page shows as "Espace web".
+
+---
+
 ## 6. Code map
 
 ```
 prisma/schema.prisma                    SmsAccount, SmsSenderId, SmsApiKey, SmsMessage,
                                         SmsCreditTransaction, SmsRateCard, SmsPackage + event tables
 prisma/migrations/20261016120000_add_sms_reselling/
+prisma/migrations/20261016150000_add_sms_portal/   SmsPortalUser, SmsPortalSession, SmsPortalToken
 prisma/seed.ts                          Cameroon rate row + Starter/Business/Pro packages
 
 lib/sms/client.ts         1s2u HTTP call + response parsing (only file that sees our credentials)
@@ -205,11 +255,23 @@ lib/validation/sms.ts     zod schemas (API + admin forms), number/SID rules
 lib/actions/sms-*.ts      server actions: accounts, sender IDs, API keys, pricing
 lib/data/sms.ts           admin queries + dashboard figures
 
+lib/sms-portal/session.ts        portal sessions (cookie ↔ SmsPortalSession)
+lib/sms-portal/throttle.ts       login attempt limiter
+lib/sms-portal/messages.ts       French error wording for customers
+lib/actions/sms-portal-auth.ts   signup, login, logout, set password from link
+lib/actions/sms-portal.ts        send, request SID, keys, profile, password
+lib/actions/sms-portal-admin.ts  admin: issue portal access/reset link
+lib/data/sms-portal.ts           account-scoped portal queries
+lib/validation/sms-portal.ts     portal zod schemas
+
 app/api/sms/v1/send/route.ts           POST  send
 app/api/sms/v1/balance/route.ts        GET   credits + account/SID status
 app/api/sms/v1/messages/[id]/route.ts  GET   one message
 app/admin/(dashboard)/sms/             accounts list, [id] detail, senders, pricing
+app/sms/(auth)/                        portal login, signup, forgot password, set password
+app/sms/(app)/                         portal pages (§5b) + historique/export CSV route
 components/admin/sms/                  ActionForm, IssueApiKeyForm, SenderIdActions, badges, nav
+components/sms-portal/                 portal nav, usage chart, composer, pagination
 ```
 
 Env (`.env.example`): `SMS_PROVIDER_BASE_URL`, `SMS_PROVIDER_USERNAME`,
@@ -341,8 +403,12 @@ Ops alerts are currently `console.error("[sms-alert] …")` in the PM2 logs
 
 - **No delivery receipts.** Ask 1s2u whether a DLR webhook or status endpoint exists.
 - **Manual payments.** There's no payment processor; admins record top-ups.
-- **No customer portal.** Admins manage SIDs and keys. A self-serve portal (with its own
-  login, usage stats and key rotation) is v2, and so is a public page documenting §7.
+- **No email delivery.** No verification at signup (an admin activates manually
+  anyway). Password resets go through support plus an admin-issued link.
+- **One login per customer account.** The schema allows several users per account,
+  but there's no UI to invite teammates yet.
+- **Not linked from the marketing site yet.** Add `/sms/inscription` and
+  `/sms/connexion` to the navbar or footer when you're ready to sell publicly.
 - **Single-process rate limits.** They're correct with PM2 `instances: 1`; scaling out
   needs Redis or Postgres.
 - **Credits don't expire.**
