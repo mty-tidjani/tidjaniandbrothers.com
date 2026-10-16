@@ -38,6 +38,12 @@ step "Installing dependencies"
 npm install
 log "Dependencies installed"
 
+step "Generating Prisma client"
+# `npm install` only regenerates the client when @prisma/client itself is
+# (re)installed — a schema-only change would otherwise leave it stale.
+npx prisma generate
+log "Prisma client generated"
+
 step "Running database migrations"
 npx prisma migrate deploy
 log "Migrations applied"
