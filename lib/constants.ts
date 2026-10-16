@@ -110,11 +110,69 @@ export const QUOTE_STATUS_ORDER = [
 
 // Tailwind class fragments keyed by status, consumed by <DevisStatusBadge>.
 export const QUOTE_STATUS_STYLES: Record<string, string> = {
-  BROUILLON: "bg-surface-variant text-on-surface-variant border-outline-variant",
+  BROUILLON:
+    "bg-surface-variant text-on-surface-variant border-outline-variant",
   SOUMIS: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
   DEVIS_ENVOYE: "bg-blue-500/10 text-blue-400 border-blue-500/30",
   CONVERTI: "bg-green-500/10 text-green-400 border-green-500/30",
-  PERDU: "bg-on-surface-variant/10 text-on-surface-variant border-outline-variant",
+  PERDU:
+    "bg-on-surface-variant/10 text-on-surface-variant border-outline-variant",
+};
+
+export const SMS_ACCOUNT_STATUS_LABELS: Record<string, string> = {
+  PENDING: "En attente",
+  ACTIVE: "Actif",
+  SUSPENDED: "Suspendu",
+  DISABLED: "Désactivé",
+};
+
+export const SMS_ACCOUNT_STATUS_STYLES: Record<string, string> = {
+  PENDING: "bg-surface-variant text-on-surface-variant border-outline-variant",
+  ACTIVE: "bg-green-500/10 text-green-400 border-green-500/30",
+  SUSPENDED: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+  DISABLED: "bg-error/10 text-error border-error/30",
+};
+
+export const SMS_SENDER_ID_STATUS_LABELS: Record<string, string> = {
+  PENDING_REVIEW: "À valider",
+  APPROVED: "Approuvé",
+  BLOCKED: "Bloqué",
+  REJECTED: "Rejeté",
+};
+
+export const SMS_SENDER_ID_STATUS_ORDER = [
+  "PENDING_REVIEW",
+  "APPROVED",
+  "BLOCKED",
+  "REJECTED",
+] as const;
+
+export const SMS_SENDER_ID_STATUS_STYLES: Record<string, string> = {
+  PENDING_REVIEW: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
+  APPROVED: "bg-green-500/10 text-green-400 border-green-500/30",
+  BLOCKED: "bg-error/10 text-error border-error/30",
+  REJECTED: "bg-surface-variant text-on-surface-variant border-outline-variant",
+};
+
+export const SMS_MESSAGE_STATUS_LABELS: Record<string, string> = {
+  PENDING: "En cours",
+  SENT: "Envoyé",
+  PARTIAL: "Partiel",
+  FAILED: "Échec",
+};
+
+export const SMS_MESSAGE_STATUS_STYLES: Record<string, string> = {
+  PENDING: "bg-surface-variant text-on-surface-variant border-outline-variant",
+  SENT: "bg-green-500/10 text-green-400 border-green-500/30",
+  PARTIAL: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+  FAILED: "bg-error/10 text-error border-error/30",
+};
+
+export const SMS_CREDIT_TXN_LABELS: Record<string, string> = {
+  TOPUP: "Recharge",
+  DEBIT: "Envoi",
+  REFUND: "Remboursement",
+  ADJUSTMENT: "Ajustement",
 };
 
 export const BLOG_CATEGORY_LABELS: Record<string, string> = {
@@ -170,6 +228,7 @@ export const ADMIN_NAV_LINKS: AdminNavLink[] = [
     icon: "extension",
     adminOnly: true,
   },
+  { href: "/admin/sms", label: "SMS", icon: "sms", adminOnly: true },
   { href: "/admin/team", label: "Équipe", icon: "group", adminOnly: true },
   { href: "/admin/settings", label: "Paramètres", icon: "settings" },
 ];

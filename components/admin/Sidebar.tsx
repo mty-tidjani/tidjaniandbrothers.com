@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   Receipt,
+  MessageSquareText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ADMIN_NAV_LINKS } from "@/lib/constants";
@@ -25,6 +26,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   edit_note: FileEdit,
   business_center: Briefcase,
   extension: Blocks,
+  sms: MessageSquareText,
   group: Users,
   settings: Settings,
 };

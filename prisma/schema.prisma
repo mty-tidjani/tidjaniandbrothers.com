@@ -58,6 +58,10 @@ model User {
   leadStatusEvents  LeadStatusEvent[]
   passwordResets    PasswordResetToken[]
   quoteStatusEvents QuoteStatusEvent[]
+
+  smsAccountStatusEvents  SmsAccountStatusEvent[]
+  smsSenderIdStatusEvents SmsSenderIdStatusEvent[]
+  smsCreditTransactions   SmsCreditTransaction[]
 }
 
 model Lead {
@@ -106,11 +110,11 @@ model LeadStatusEvent {
 }
 
 model QuoteRequest {
-  id              String      @id @default(cuid())
-  sessionId       String      @unique
-  status          QuoteStatus @default(BROUILLON)
-  currentStep     Int         @default(1)
-  answers         Json        @default("{}")
+  id          String      @id @default(cuid())
+  sessionId   String      @unique
+  status      QuoteStatus @default(BROUILLON)
+  currentStep Int         @default(1)
+  answers     Json        @default("{}")
 
   companyName     String?
   contactName     String?
@@ -118,12 +122,12 @@ model QuoteRequest {
   contactEmail    String?
   budgetMentioned String?
 
-  proposedAmount  Int?
-  internalNote    String?
+  proposedAmount Int?
+  internalNote   String?
 
-  submittedAt     DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   statusEvents QuoteStatusEvent[]
 
@@ -140,7 +144,7 @@ model QuoteStatusEvent {
   createdAt  DateTime     @default(now())
 
   quote QuoteRequest @relation(fields: [quoteId], references: [id], onDelete: Cascade)
-  actor User?         @relation(fields: [actorId], references: [id])
+  actor User?        @relation(fields: [actorId], references: [id])
 }
 
 model BlogPost {
@@ -179,15 +183,15 @@ model CaseStudy {
 }
 
 model ServiceTier {
-  id            String  @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String
   priceMin      Int
   priceMax      Int?
-  currency      String  @default("FCFA")
+  currency      String   @default("FCFA")
   features      String[]
   maxUsers      String?
-  isMaintenance Boolean @default(false)
-  sortOrder     Int     @default(0)
+  isMaintenance Boolean  @default(false)
+  sortOrder     Int      @default(0)
 }
 
 model CompanySettings {
@@ -224,4 +228,218 @@ model TeamInvite {
   expiresAt  DateTime
   acceptedAt DateTime?
   createdAt  DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// SMS reselling (upstream provider: 1s2u). See SMS.md.
+// One credit = one SMS part to the reference corridor (Cameroon). Other
+// destinations cost `SmsRateCard.creditsPerPart` credits per part.
+// ---------------------------------------------------------------------------
+
+enum SmsAccountStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum SmsSenderIdStatus {
+  PENDING_REVIEW
+  APPROVED
+  BLOCKED
+  REJECTED
+}
+
+enum SmsCreditTxnType {
+  TOPUP
+  DEBIT
+  REFUND
+  ADJUSTMENT
+}
+
+enum SmsMessageStatus {
+  PENDING
+  SENT
+  PARTIAL
+  FAILED
+}
+
+enum SmsEncoding {
+  GSM7
+  UNICODE
+}
+
+model SmsAccount {
+  id            String           @id @default(cuid())
+  companyName   String
+  contactName   String
+  contactEmail  String           @unique
+  contactPhone  String
+  status        SmsAccountStatus @default(PENDING)
+  creditBalance Int              @default(0)
+  notes         String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  senderIds    SmsSenderId[]
+  apiKeys      SmsApiKey[]
+  messages     SmsMessage[]
+  transactions SmsCreditTransaction[]
+  statusEvents SmsAccountStatusEvent[]
+
+  @@index([status])
+}
+
+model SmsAccountStatusEvent {
+  id         String            @id @default(cuid())
+  accountId  String
+  fromStatus SmsAccountStatus?
+  toStatus   SmsAccountStatus
+  reason     String?
+  actorId    String?
+  createdAt  DateTime          @default(now())
+
+  account SmsAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  actor   User?      @relation(fields: [actorId], references: [id])
+}
+
+model SmsSenderId {
+  id           String            @id @default(cuid())
+  // Exactly as it will be displayed on handsets.
+  value        String
+  // Uppercased `value`: uniqueness is case-insensitive so "MyBank" and
+  // "MYBANK" can't be registered by two different customers.
+  normalized   String            @unique
+  accountId    String
+  status       SmsSenderIdStatus @default(PENDING_REVIEW)
+  statusReason String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  account      SmsAccount               @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  apiKeys      SmsApiKey[]
+  messages     SmsMessage[]
+  statusEvents SmsSenderIdStatusEvent[]
+
+  @@index([status])
+  @@index([accountId])
+}
+
+model SmsSenderIdStatusEvent {
+  id         String             @id @default(cuid())
+  senderIdId String
+  fromStatus SmsSenderIdStatus?
+  toStatus   SmsSenderIdStatus
+  reason     String?
+  actorId    String?
+  createdAt  DateTime           @default(now())
+
+  senderId SmsSenderId @relation(fields: [senderIdId], references: [id], onDelete: Cascade)
+  actor    User?       @relation(fields: [actorId], references: [id])
+}
+
+// Each key is bound to exactly one sender ID. A sender ID may have several
+// keys over time so a leaked key can be rotated without re-registering it.
+model SmsApiKey {
+  id         String    @id @default(cuid())
+  accountId  String
+  senderIdId String
+  label      String
+  // First characters of the secret, shown in the admin UI to identify it.
+  keyPrefix  String
+  // SHA-256 of the full secret. Keys are 256-bit random, so a fast hash is
+  // safe here and lets us look a key up in O(1) on every request.
+  keyHash    String    @unique
+  revokedAt  DateTime?
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  account  SmsAccount   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  senderId SmsSenderId  @relation(fields: [senderIdId], references: [id], onDelete: Cascade)
+  messages SmsMessage[]
+
+  @@index([accountId])
+}
+
+model SmsMessage {
+  id                 String           @id @default(cuid())
+  accountId          String
+  apiKeyId           String?
+  senderIdId         String
+  senderValue        String
+  recipients         String[]
+  body               String
+  encoding           SmsEncoding
+  parts              Int
+  creditsCharged     Int
+  creditsRefunded    Int              @default(0)
+  // Our estimated cost at 1s2u for the parts actually submitted.
+  upstreamCostFcfa   Int              @default(0)
+  status             SmsMessageStatus @default(PENDING)
+  upstreamMessageIds String[]
+  errorCode          String?
+  // One entry per ≤30-recipient upstream batch: { recipients, ok, upstreamId?, errorCode? }.
+  batches            Json             @default("[]")
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  account      SmsAccount             @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  apiKey       SmsApiKey?             @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  senderId     SmsSenderId            @relation(fields: [senderIdId], references: [id], onDelete: Cascade)
+  transactions SmsCreditTransaction[]
+
+  @@index([accountId, createdAt])
+  @@index([status])
+}
+
+model SmsCreditTransaction {
+  id           String           @id @default(cuid())
+  accountId    String
+  type         SmsCreditTxnType
+  // Positive for TOPUP/REFUND, negative for DEBIT, either sign for ADJUSTMENT.
+  credits      Int
+  balanceAfter Int
+  // What the customer paid us, for TOPUP rows. Drives the margin report.
+  amountFcfa   Int?
+  packageId    String?
+  messageId    String?
+  note         String?
+  actorId      String?
+  createdAt    DateTime         @default(now())
+
+  account SmsAccount  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  package SmsPackage? @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  message SmsMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  actor   User?       @relation(fields: [actorId], references: [id])
+
+  @@index([accountId, createdAt])
+}
+
+// What 1s2u charges us per SMS part, per destination prefix. Longest prefix
+// wins. A destination with no active row is refused, so we never send
+// traffic whose cost we don't know.
+model SmsRateCard {
+  id               String   @id @default(cuid())
+  // Country calling code or longer network prefix, digits only (e.g. "237").
+  prefix           String   @unique
+  label            String
+  upstreamCostFcfa Int
+  creditsPerPart   Int      @default(1)
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+// Prepaid credit bundles we sell (the public price list).
+model SmsPackage {
+  id        String   @id @default(cuid())
+  name      String
+  credits   Int
+  priceFcfa Int
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions SmsCreditTransaction[]
 }

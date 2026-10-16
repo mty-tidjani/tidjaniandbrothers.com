@@ -248,6 +248,39 @@ async function main() {
     });
   }
 
+  // SMS reselling — see SMS.md §2. 1s2u's public price list
+  // (1s2u.com/pricing): Standard $0.10/SMS, High Quality $0.11/SMS. We price
+  // off High Quality so the markup holds whichever tier our account is on.
+  const SMS_UPSTREAM_USD = 0.11;
+  const USD_TO_FCFA = 585; // mid-market, 16 Oct 2026
+  const SMS_PROFIT_MARKUP = 0.5; // +50% on our cost
+  const smsCostFcfa = Math.ceil(SMS_UPSTREAM_USD * USD_TO_FCFA); // 65
+  const smsPricePerCredit = Math.ceil(smsCostFcfa * (1 + SMS_PROFIT_MARKUP)); // 98
+
+  await prisma.smsRateCard.upsert({
+    where: { prefix: "237" },
+    update: {},
+    create: {
+      prefix: "237",
+      label: "Cameroun (MTN, Orange)",
+      upstreamCostFcfa: smsCostFcfa,
+      creditsPerPart: 1,
+    },
+  });
+
+  // Same price per credit in every package; they differ only in size.
+  const smsPackages = [
+    { name: "Starter", credits: 500, sortOrder: 1 },
+    { name: "Business", credits: 2_500, sortOrder: 2 },
+    { name: "Pro", credits: 10_000, sortOrder: 3 },
+  ].map((pkg) => ({ ...pkg, priceFcfa: pkg.credits * smsPricePerCredit }));
+  for (const pkg of smsPackages) {
+    const existing = await prisma.smsPackage.findFirst({
+      where: { name: pkg.name },
+    });
+    if (!existing) await prisma.smsPackage.create({ data: pkg });
+  }
+
   console.log("Seed complete.");
 }
 

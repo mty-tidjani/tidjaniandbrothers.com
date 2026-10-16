@@ -1,433 +1,352 @@
-# SMS Reselling Service — Development Plan
+# SMS Reselling Service
 
-Status: **planning draft** — no code written yet. This document defines the business
-model (pricing/margin), the account & key lifecycle, and how the service plugs into
-the existing `tidjanibrothers.com` codebase as a new core service, alongside the
-Odoo/web-design business.
+Status: **v1 implemented**. Migration not yet applied to a database, and not yet tested
+against the live 1s2u API (see §9 before launch).
 
-Upstream provider: **1s2u** (`https://api.1s2u.io/bulksms`), HTTP GET/POST, one-way
-SMS only. We hold **one** 1s2u account (one `username`/`password`) and resell capacity
-to many of our own customers, each isolated by API key + Sender ID (SID).
-
----
-
-## 0. Business model in one paragraph
-
-We are a **middleman**: 1s2u bills *us* per SMS sent through *our* master account.
-We bill *our* customers per SMS (or per prepaid credit bundle) at a markup, through
-*our own* API. Customers never see 1s2u's username/password or URL — they only ever
-talk to `api.tidjanibrothers.com/sms/v1/...` with an API key we issue them. Our
-gateway re-signs every request with the 1s2u master credentials before forwarding it.
+Upstream provider: **1s2u** (`https://api.1s2u.io/bulksms`), HTTP GET, one-way SMS
+only. We hold **one** 1s2u account and resell capacity to many customers, each
+isolated by API key + Sender ID (SID). Customers only ever see our API
+(`/api/sms/v1/...`) and never 1s2u's URL or our credentials.
 
 ---
 
-## 1. Constraints pulled from the 1s2u reference (binding on our design)
+## 1. Constraints from the 1s2u reference, and how we handle them
 
-| Constraint | Value | Impact on our design |
+| 1s2u constraint | Value | Where it's handled |
 |---|---|---|
-| Recipients per request | max 30 numbers, comma-separated | We must chunk any customer request >30 recipients into multiple upstream calls transparently |
-| Message length | up to 5 parts; 153 chars/part (GSM-7), 67 chars/part (Unicode) | Billing must be **per part**, not per message |
-| Sender ID (SID) length | 15 chars if numeric-only, 11 chars if alphanumeric; `+` must be URL-encoded if used | Validate at SID-registration time, not at send time |
-| Rate limit | 30 req/s per 1s2u account; 150 req/s per IP | Our outbound gateway must throttle *below* 30 req/s in aggregate across **all** our customers, since we share one upstream account. This is the hard ceiling that drives our own per-customer rate limits. |
-| Message types | `mt=0` plain (GSM-7/English), `mt=1` Unicode (hex-encoded) | Our API accepts UTF-8 text and auto-selects `mt` + hex-encodes when non-GSM-7 chars are present |
-| Response | `OK: <id>` or `ERROR: <code>` | We normalize this into a JSON response and store the upstream id for reconciliation |
-| Error codes | `0000,000,00,0020,0030,0041,0042,0050,0051,0060` | Mapped to stable customer-facing error codes (see §7) |
-| No delivery receipts documented | — | **Open question for 1s2u support** — confirm if a DLR callback/webhook exists outside this doc. Until confirmed, `SmsMessage.status` only reflects submission success, not actual handset delivery. |
+| Recipients per request | max 30 | `gateway.ts` splits each customer request (up to 300 numbers) into batches of 30 |
+| Message length | max 5 parts; 153 chars/part GSM-7, 67 chars/part Unicode (160/70 for a single part) | `segmentation.ts`; we bill **per part** |
+| Message type | `mt=0` plain, `mt=1` Unicode as hex | auto-detected from the text; Unicode sent as UTF-16BE hex (checked against 1s2u's own Arabic example) |
+| Sender name | ≤15 digits if numeric, ≤11 chars if alphanumeric | validated when the SID is registered (`validation/sms.ts`) |
+| Number format | no `+` / `00` | we accept `+`, `00`, spaces and dashes from customers and strip them |
+| Rate limit | 30 req/s per account (shared by **all** our customers), 150 req/s per IP | global outbound limit of 25 req/s, plus 5 req/s per API key (`rate-limit.ts`) |
+| Response | `OK: <id>` / `ERROR: <code>` | parsed into JSON; 1s2u ids are stored for reconciliation |
+| Delivery receipts | not documented | `status` means **accepted by 1s2u**, not delivered to the handset |
 
 ---
 
-## 2. Pricing & margin strategy
+## 2. Pricing
 
-**We do not have 1s2u's actual per-SMS cost yet** — the reference page describes the
-API mechanics, not the price list (1s2u prices per-corridor/network and it's
-typically negotiated per account volume). Everything below is a **pricing model**
-with illustrative placeholder costs you must replace with the real figures from your
-1s2u contract/account manager before launch. The formula and margin bands are the
-actual deliverable; the numbers are examples.
+### 2.1 Cost basis
 
-### 2.1 Cost basis (fill in from 1s2u invoice/rate card)
+1s2u's public price list ([1s2u.com/pricing](https://1s2u.com/pricing)), checked 16 Oct
+2026. No Cameroon-specific or reseller rate is published:
 
-| Corridor | Example upstream cost (FCFA/SMS part) | Status |
+| 1s2u tier | Delivery rate | Price | ≈ FCFA/SMS at 585 FCFA/USD |
+|---|---|---:|---:|
+| Standard | 84–89% | $10 / 100 SMS ($0.10) | 58.5 |
+| **High Quality** | 93–97% | $11 / 100 SMS ($0.11) | **64.35** |
+| Direct Connection | 95–100% | quote only | — |
+
+We price off **High Quality**. It's the tier worth reselling to businesses (OTPs at an
+84% delivery rate generate support tickets). It's also the higher cost, so the markup
+holds even if our account is on Standard.
+
+```
+cost  = ceil($0.11 × 585)  = 65 FCFA per part   (SmsRateCard 237)
+price = ceil(65 × 1.5)     = 98 FCFA per credit (+50% on cost)
+```
+
+The inputs are constants at the top of the SMS block in `prisma/seed.ts`. 585 is the
+mid-market USD→FCFA rate on 16 Oct 2026; the card or bank rate we actually pay will be
+slightly worse. After seeding, edit both values at `/admin/sms/pricing`.
+
+### 2.2 Credits
+
+**1 credit = 1 SMS part to Cameroon.** Customers buy credits up front. A 2-part message
+to 3 numbers costs 6 credits. For other destinations an admin adds a rate row with
+`creditsPerPart` > 1 (e.g. a destination that costs us 130 FCFA → 2 credits/part).
+**A destination with no rate row is refused**, so we never send traffic we haven't
+priced.
+
+### 2.3 Public price list (seeded)
+
+| Package | Credits | Price | Per credit | Our cost | Profit | Markup |
+|---|---:|---:|---:|---:|---:|---:|
+| Starter | 500 | 49 000 FCFA | 98 FCFA | 32 500 FCFA | 16 500 FCFA | 51% |
+| Business | 2 500 | 245 000 FCFA | 98 FCFA | 162 500 FCFA | 82 500 FCFA | 51% |
+| Pro | 10 000 | 980 000 FCFA | 98 FCFA | 650 000 FCFA | 330 000 FCFA | 51% |
+
+- *Markup* is profit ÷ our cost. It shows 51% rather than 50% because the cost and the
+  price are both rounded up. Measured against the true $0.11 cost (64.35 FCFA), it's
+  52%.
+- *Gross margin*, which is profit ÷ selling price, is 34%. A 50% markup is not a 50%
+  margin. A 50% margin would need a price of 130 FCFA per credit.
+- Every package has the same price per credit, so no package ever goes below +50%. A
+  volume discount on Business/Pro would cut into that.
+- The pricing page recalculates margins live and flags any package that loses money.
+- `npm run db:seed` only creates these rows if they don't exist yet; it never
+  overwrites prices edited in the admin.
+
+### 2.4 The rate to negotiate
+
+At the public rate we have to sell at 98 FCFA/SMS. For comparison, eSMS Africa lists
+Cameroon at 20–30 FCFA. 1s2u advertises bulk "from $0.009", and that negotiated rate is
+where this becomes competitive. The same +50% on different cost bases:
+
+| 1s2u cost | ≈ FCFA/part (585/USD) | Our price at +50% |
+|---|---:|---:|
+| $0.11 (High Quality, public, today) | 65 | 98 |
+| $0.10 (Standard, public) | 59 | 89 |
+| $0.05 | 30 | 45 |
+| $0.03 | 18 | 27 |
+| $0.02 | 12 | 18 |
+
+**Action:** ask 1s2u for a Cameroon (MTN + Orange) volume quote before launch. Then
+update the 237 rate and the package prices on `/admin/sms/pricing`. No code change is
+needed.
+
+### 2.5 Profit tracking
+
+Every top-up records what the customer paid (`amountFcfa`). Every send records what it
+cost us at 1s2u (`upstreamCostFcfa`). The `/admin/sms` dashboard shows revenue, 1s2u
+cost and gross margin. This compares cash collected with usage, so unspent customer
+credit shows up as margin until it's used. The "credits in circulation" figure on the
+same dashboard is that liability.
+
+---
+
+## 3. Customer accounts: activate / deactivate
+
+`SmsAccount` holds one row per reselling customer. Customers are separate from `User`,
+which stays staff-only.
+
+| Status | Can send? | Meaning |
 |---|---|---|
-| Cameroon — MTN | *TBD* | Need 1s2u rate card |
-| Cameroon — Orange | *TBD* | Need 1s2u rate card |
-| Other CEMAC countries | *TBD* | Need 1s2u rate card |
-| Rest of Africa | *TBD* | Need 1s2u rate card |
-| International (outside Africa) | *TBD* | Need 1s2u rate card |
-| Unicode surcharge | 1s2u doesn't document a surcharge; assume same cost/part as plain, but part size shrinks from 153→67 chars, so a long Unicode message costs more parts | — |
+| `PENDING` | no | created, not yet activated |
+| `ACTIVE` | yes | normal |
+| `SUSPENDED` | no | temporary (e.g. non-payment); reversible |
+| `DISABLED` | no, and the read endpoints are refused too | terminal; can still be reactivated by an admin |
 
-Store this as a `SmsRateCard` table keyed by `(countryCode, network?)` rather than a
-constant, since 1s2u rates differ by destination and will change over time.
-
-### 2.2 Margin formula
-
-```
-sell_price_per_part = upstream_cost_per_part × (1 + margin_pct) , rounded up to the
-nearest pricing_unit (e.g. nearest 1 FCFA, or nearest $0.001)
-```
-
-Recommended margin bands (typical for SMS resale businesses; tune once real cost is
-known — gross margin on SMS resale commonly lands 35–70%):
-
-| Plan | Margin over upstream cost | Who it's for |
-|---|---|---|
-| Pay-as-you-go | 70–100% | Low-volume, no commitment, highest margin to offset support overhead |
-| Business (prepaid bundle) | 45–60% | Most customers; buys a credit bundle up front |
-| Volume / Enterprise | 25–40% | High-volume customers (>100k SMS/mo); negotiated, still profitable |
-
-### 2.3 Example retail price table (FCFA, Cameroon corridor, illustrative only)
-
-| Package | Credits (= SMS parts) | List price (FCFA) | Effective price/part | Validity |
-|---|---|---|---|---|
-| Starter | 500 | 7 500 | 15 | 90 days |
-| Business | 5 000 | 60 000 | 12 | 180 days |
-| Growth | 20 000 | 200 000 | 10 | 365 days |
-| Enterprise | ≥100 000 | Custom quote | Negotiated | Negotiated |
-
-Pay-as-you-go (no bundle): slightly above the Starter per-part rate, billed from a
-revolving wallet, to reward prepayment/commitment.
-
-### 2.4 Billing unit
-
-Bill in **parts**, not messages — a 2-part Unicode message consumes 2 credits. This
-matches how 1s2u itself counts cost (153/67-char segmentation) and avoids us eating
-the margin on long messages.
-
-### 2.5 Open inputs needed from you before this section is final
-
-1. Real 1s2u cost per SMS/part for Cameroon (MTN + Orange) — our primary corridor.
-2. Whether 1s2u bills us in FCFA, XAF, or USD, and at what FX/settlement terms.
-3. Target margin — confirm the bands above or supply your own.
-4. Payment collection method for customers (mobile money, bank transfer, card) — no
-   payment processor exists in this codebase yet (see §8).
+- Changes are made from `/admin/sms/[id]`. A reason is required to suspend or disable.
+- Every change writes an `SmsAccountStatusEvent` (who, when, why), shown as a timeline
+  on the account page. This follows the same audit pattern as `LeadStatusEvent`.
+- **Changes take effect on the next API call.** Status is re-read on every request,
+  and the credit debit itself only succeeds while the account is `ACTIVE`.
 
 ---
 
-## 3. Account lifecycle (activate / deactivate)
+## 4. Sender IDs and API keys
 
-New Prisma model `SmsAccount` — one row per **reselling customer** (distinct from the
-internal `User` table, which is staff/admin only).
+- **SIDs are globally unique, case-insensitive** (`normalized` = uppercase value, with a
+  unique index). "MyBank" and "MYBANK" can't belong to two customers.
+- **Each API key is bound to exactly one SID.** An account can hold many SIDs and many
+  keys. A SID can have several keys over time, so a leaked key can be revoked and
+  replaced without re-registering the sender name.
+- SID lifecycle: `PENDING_REVIEW` → `APPROVED` / `REJECTED`. From any status, an admin
+  can **block**; unblocking returns the SID to `APPROVED`. A reason is required to
+  reject or block, and every change writes an `SmsSenderIdStatusEvent`.
+- **Blocking a SID is independent of the account.** It stops every key on that SID on
+  the next request, while the account's other SIDs keep working. A blocked name stays
+  reserved, so nobody else can register it, and an admin can ban a name pre-emptively.
+- If 1s2u rejects an approved SID (code `0030`), the gateway automatically sends it
+  back to `PENDING_REVIEW` and logs a system event.
+- The global SID registry is at `/admin/sms/senders`, with names awaiting review listed
+  first.
+- Keys look like `tbsms_<43 random chars>`. The full key is **shown once** at creation.
+  We only store its SHA-256 hash. SHA-256 is used rather than bcrypt because the key is
+  256-bit random, so a fast hash is safe and allows a direct lookup on every request.
+  The admin UI shows the first 14 characters to identify a key.
+- All SMS administration requires `Role.ADMIN`, checked both on the pages and inside
+  every server action.
 
-```prisma
-enum SmsAccountStatus {
-  PENDING    // created by admin, no active keys yet
-  ACTIVE
-  SUSPENDED  // temporary, e.g. non-payment — reversible
-  DISABLED   // terminal, admin-only, requires reactivation decision
-}
+### Onboarding a customer
 
-model SmsAccount {
-  id            String            @id @default(cuid())
-  companyName   String
-  contactName   String
-  contactEmail  String            @unique
-  contactPhone  String
-  status        SmsAccountStatus  @default(PENDING)
-  creditBalance Int               @default(0)   // in parts/credits
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-
-  apiKeys       SmsApiKey[]
-  messages      SmsMessage[]
-  transactions  SmsCreditTransaction[]
-  statusEvents  SmsAccountStatusEvent[]
-}
-
-model SmsAccountStatusEvent {
-  id         String            @id @default(cuid())
-  accountId  String
-  fromStatus SmsAccountStatus?
-  toStatus   SmsAccountStatus
-  reason     String?
-  actorId    String?            // staff User.id who made the change
-  createdAt  DateTime           @default(now())
-
-  account SmsAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  actor   User?      @relation(fields: [actorId], references: [id])
-}
-```
-
-This mirrors the existing `Lead`/`LeadStatusEvent` and `QuoteRequest`/
-`QuoteStatusEvent` audit-trail pattern already in `prisma/schema.prisma` — reuse it
-rather than inventing a new convention.
-
-**Enforcement rule:** every inbound send request checks `account.status === "ACTIVE"`
-*in addition to* the API key and SID both being valid/unblocked. Suspending or
-disabling an account must take effect immediately — check status on every request,
-not just at key-issue time — since this is the admin's kill switch for non-payment or
-abuse.
-
-Admin actions (server actions, same shape as `lib/actions/leads.ts::updateLeadStatus`):
-`activateAccount`, `suspendAccount(reason)`, `disableAccount(reason)`,
-`reactivateAccount`. Each writes a `SmsAccountStatusEvent` row for the audit trail
-visible in the admin UI.
+1. `/admin/sms` → **Nouveau compte client** (the account starts as `PENDING`).
+2. On the account page: **Ajouter un expéditeur** → approve it once it's cleared with
+   1s2u/carriers.
+3. **Enregistrer un paiement**: pick the package they paid for (or a custom amount),
+   with the payment reference.
+4. **Générer** an API key for that SID and send it to the customer securely.
+5. Set the status to **Activer**.
 
 ---
 
-## 4. API keys ↔ Sender ID (SID) model
+## 5. Credits ledger
 
-Rules from the brief: one account → many API keys; each API key → exactly one SID;
-SIDs are globally unique; super admin can block/ban any SID at any time.
+Every balance change is an `SmsCreditTransaction` row with `balanceAfter`: `TOPUP`,
+`DEBIT`, `REFUND` or `ADJUSTMENT`. All of them go through `lib/sms/credits.ts`.
 
-```prisma
-enum SmsSenderIdStatus {
-  PENDING_REVIEW  // submitted, awaiting manual approval (carriers vet sender names)
-  APPROVED
-  BLOCKED         // admin-banned — independent of the owning account's status
-  REJECTED        // never approved
-}
+Send flow:
 
-model SmsSenderId {
-  id         String            @id @default(cuid())
-  value      String            @unique   // the actual SID text, globally unique
-  accountId  String
-  status     SmsSenderIdStatus @default(PENDING_REVIEW)
-  blockedReason String?
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
+1. **Reserve.** In one DB transaction, create the message and debit
+   `parts × creditsPerPart` per recipient. The debit is a conditional update
+   (`balance >= cost AND status = ACTIVE`), so concurrent sends can't overdraw and
+   nothing is sent without credit.
+2. Call 1s2u in batches of 30, outside the transaction.
+3. **Refund** the credits for any batch 1s2u rejected, and record the actual 1s2u cost
+   of the batches that went through.
 
-  account      SmsAccount              @relation(fields: [accountId], references: [id])
-  apiKeys      SmsApiKey[]
-  statusEvents SmsSenderIdStatusEvent[]
-
-  @@index([status])
-}
-
-model SmsSenderIdStatusEvent {
-  id          String             @id @default(cuid())
-  senderIdId  String
-  fromStatus  SmsSenderIdStatus?
-  toStatus    SmsSenderIdStatus
-  actorId     String?
-  createdAt   DateTime           @default(now())
-
-  senderId SmsSenderId @relation(fields: [senderIdId], references: [id], onDelete: Cascade)
-  actor    User?       @relation(fields: [actorId], references: [id])
-}
-
-model SmsApiKey {
-  id          String   @id @default(cuid())
-  accountId   String
-  senderIdId  String   @unique   // 1 key : 1 SID, enforced at the DB level
-  label       String             // customer-facing name, e.g. "Production key"
-  keyPrefix   String             // first 8 chars shown in the UI, e.g. "stb_live_a1b2c3"
-  keyHash     String   @unique   // bcrypt hash of the full secret, never store plaintext
-  revokedAt   DateTime?
-  lastUsedAt  DateTime?
-  createdAt   DateTime @default(now())
-
-  account  SmsAccount  @relation(fields: [accountId], references: [id])
-  senderId SmsSenderId @relation(fields: [senderIdId], references: [id])
-  messages SmsMessage[]
-}
-```
-
-Why `senderIdId @unique` on `SmsApiKey`: a one-to-one between key and SID, as
-specified. If a customer needs a second SID, they request a second SID + get a
-second key — the account can hold many of each.
-
-### 4.1 Lifecycle
-
-1. Admin creates `SmsAccount` (status `PENDING`).
-2. Customer (or admin on their behalf) requests a SID → `SmsSenderIdStatus.PENDING_REVIEW`.
-   Validate length/charset per the 1s2u rules in §1 at submission time, so obviously
-   invalid SIDs never reach "pending".
-3. Admin manually approves (1s2u/SMSC-level sender names often need carrier
-   whitelisting outside our control — don't auto-approve) → `APPROVED`.
-4. Admin issues an `SmsApiKey` for that SID → full secret shown **once**, only the
-   hash is persisted (same approach as `passwordHash` on `User`, via `bcryptjs`
-   already a dependency).
-5. Setting `SmsAccount.status = ACTIVE` (step not strictly ordered before/after key
-   issuance, but a key is useless until the account is `ACTIVE`).
-
-### 4.2 Blocking a SID (super admin action)
-
-`blockSenderId(senderIdId, reason)` sets `SmsSenderId.status = BLOCKED` and writes a
-`SmsSenderIdStatusEvent`. This must be **independent of the account's own status** —
-an otherwise-healthy, paying account can have one abusive SID blocked (e.g. a
-customer impersonating a bank's sender name) while its other SIDs keep working.
-The gateway auth check (§6) must verify both the account status *and* the specific
-SID status on every request, not just the API key's validity.
-
-Only `Role.ADMIN` can block/approve SIDs or activate/suspend accounts — reuse the
-existing `Role` enum and the `adminOnly` flag pattern already used in
-`ADMIN_NAV_LINKS` (`lib/constants.ts`) rather than inventing a new role for this.
+Manual adjustments (either sign) need a reason and can't take a balance below zero.
 
 ---
 
-## 5. Credits / wallet (billing engine)
+## 6. Code map
 
-```prisma
-enum SmsCreditTxnType {
-  TOPUP       // admin credits the account after receiving payment
-  DEBIT       // consumed by a sent message (per part)
-  REFUND      // failed upstream send, credit returned
-  ADJUSTMENT  // manual correction by admin
-}
+```
+prisma/schema.prisma                    SmsAccount, SmsSenderId, SmsApiKey, SmsMessage,
+                                        SmsCreditTransaction, SmsRateCard, SmsPackage + event tables
+prisma/migrations/20261016120000_add_sms_reselling/
+prisma/seed.ts                          Cameroon rate row + Starter/Business/Pro packages
 
-model SmsCreditTransaction {
-  id        String            @id @default(cuid())
-  accountId String
-  type      SmsCreditTxnType
-  amount    Int               // positive for TOPUP/REFUND, negative for DEBIT
-  balanceAfter Int
-  messageId String?           // set for DEBIT/REFUND, links to the triggering send
-  note      String?
-  actorId   String?           // staff member for TOPUP/ADJUSTMENT
-  createdAt DateTime          @default(now())
+lib/sms/client.ts         1s2u HTTP call + response parsing (only file that sees our credentials)
+lib/sms/gateway.ts        send orchestration: validate → price → reserve → batch → refund
+lib/sms/auth.ts           API key → account/SID checks on every request
+lib/sms/segmentation.ts   GSM-7 vs Unicode detection, part counting, hex encoding
+lib/sms/pricing.ts        rate lookup (longest prefix), quotes, margin maths
+lib/sms/credits.ts        atomic balance changes + ledger rows
+lib/sms/rate-limit.ts     global outbound limiter + per-key limiter
+lib/sms/errors.ts         customer error codes + 1s2u error mapping
+lib/sms/keys.ts           key generation / hashing / header parsing
+lib/sms/sender-transitions.ts  allowed SID status changes (shared by UI + action)
+lib/sms/admin.ts, route.ts     admin guard / action state, route error boundary
+lib/notifications/sms.ts  ops alert stub (console.error for now)
+lib/validation/sms.ts     zod schemas (API + admin forms), number/SID rules
+lib/actions/sms-*.ts      server actions: accounts, sender IDs, API keys, pricing
+lib/data/sms.ts           admin queries + dashboard figures
 
-  account SmsAccount @relation(fields: [accountId], references: [id])
-  message SmsMessage? @relation(fields: [messageId], references: [id])
-}
+app/api/sms/v1/send/route.ts           POST  send
+app/api/sms/v1/balance/route.ts        GET   credits + account/SID status
+app/api/sms/v1/messages/[id]/route.ts  GET   one message
+app/admin/(dashboard)/sms/             accounts list, [id] detail, senders, pricing
+components/admin/sms/                  ActionForm, IssueApiKeyForm, SenderIdActions, badges, nav
 ```
 
-Debit happens **atomically** with message submission inside a `$transaction`
-(balance check → decrement → create message row → call 1s2u). If the upstream call
-fails outright (not just a carrier-side async failure we can't see), auto-`REFUND`
-the debited parts.
-
-Pre-send guard: reject the request with a clear `INSUFFICIENT_CREDIT` error *before*
-calling 1s2u if `creditBalance < part_count`, so we never pay 1s2u for a send we
-can't bill.
+Env (`.env.example`): `SMS_PROVIDER_BASE_URL`, `SMS_PROVIDER_USERNAME`,
+`SMS_PROVIDER_PASSWORD`.
 
 ---
 
-## 6. Core integration into the existing codebase
+## 7. Public API reference (v1)
 
-Follows the repository's existing conventions exactly (Next.js App Router, Prisma,
-Zod-first validation, `lib/data` read helpers, `lib/actions` server-action mutations,
-status-event audit trail, admin-only nav gating):
+Base URL: `https://tidjanibrothers.com/api/sms/v1`. Authenticate with
+`Authorization: Bearer tbsms_...`; `X-API-Key: tbsms_...` is also accepted. The sender
+name is fixed by the key.
 
-```
-prisma/schema.prisma          # add models from §3–5 (new migration)
+### `POST /send`
 
-lib/
-  sms/
-    client.ts                 # thin wrapper over the 1s2u HTTP call (GET/POST),
-                               # holds the master username/password from env,
-                               # never imported by anything customer-facing directly
-    gateway.ts                # orchestrates: auth check → rate limit → chunk
-                               # recipients (≤30) → segment message (parts) →
-                               # debit credits → call client.ts → persist SmsMessage
-    auth.ts                   # resolves `Authorization: Bearer <key>` → SmsApiKey
-                               # → checks key.revokedAt, senderId.status, account.status
-    pricing.ts                # upstream-cost → sell-price calc from SmsRateCard (§2)
-    segmentation.ts           # GSM-7 vs Unicode detection, part counting (153/67)
-    errors.ts                 # maps 1s2u error codes (§7) to our API error shape
-  validation/
-    sms.ts                    # zod: send request, SID registration, API key issuance
-  actions/
-    sms-accounts.ts           # activateAccount, suspendAccount, disableAccount
-    sms-sender-ids.ts         # approveSenderId, blockSenderId, rejectSenderId
-    sms-api-keys.ts           # issueApiKey, revokeApiKey
-  data/
-    sms.ts                    # getAccounts, getAccountUsage, getSenderIds, ...
-
-app/
-  api/
-    sms/
-      v1/
-        send/route.ts         # the public-facing customer endpoint (POST)
-  admin/(dashboard)/
-    sms/
-      page.tsx                # accounts list (search/filter, status badges —
-                               # reuse the <StatusBadge> component + a new
-                               # SMS_ACCOUNT_STATUS_STYLES entry in lib/constants.ts)
-      [id]/page.tsx            # account detail: SIDs, keys, usage, manual credit top-up
-      senders/page.tsx         # global SID registry — approve/block, cross-account view
-```
-
-Add to `lib/constants.ts`:
-- `SMS_ACCOUNT_STATUS_LABELS` / `_STYLES`, `SMS_SENDER_ID_STATUS_LABELS` / `_STYLES`
-  (same shape as the existing `LEAD_STATUS_*` / `QUOTE_STATUS_*` constants).
-- A new `ADMIN_NAV_LINKS` entry: `{ href: "/admin/sms", label: "SMS", icon: "sms",
-  adminOnly: true }`, plus an `Sms` (or `MessageSquare`) icon mapping in
-  `components/admin/Sidebar.tsx`'s `ICONS` record.
-
-Env vars (`.env.example`):
-```
-SMS_PROVIDER_BASE_URL=https://api.1s2u.io/bulksms
-SMS_PROVIDER_USERNAME=
-SMS_PROVIDER_PASSWORD=
-```
-These are **our** master credentials — never exposed to customers, only used inside
-`lib/sms/client.ts`.
-
-### 6.1 Public endpoint shape (customer-facing)
-
-```
-POST /api/sms/v1/send
-Authorization: Bearer stb_live_...
+```json
 {
-  "to": ["237670000000", "237650000000"],   // our array; no +/00 prefix, same as 1s2u
-  "message": "Your OTP is 4821",
-  "encoding": "auto" | "gsm7" | "unicode"    // default "auto"
+  "to": ["237670000000", "+237 650 00 00 00"],
+  "message": "Votre code est 4821",
+  "encoding": "auto"
 }
 ```
 
-The route handler: resolve key → `auth.ts` checks → `pricing.ts`/`segmentation.ts`
-compute parts/cost → debit credits transactionally → chunk `to` into ≤30-recipient
-batches → call `gateway.ts` → persist `SmsMessage` per batch → return a normalized
-JSON response (not 1s2u's raw `OK:`/`ERROR:` text).
+- `to`: an array or a comma-separated string, 1–300 numbers, in international format.
+  `+`, `00`, spaces and dashes are accepted. Duplicates are removed.
+- `message`: 1–2000 characters, at most 5 SMS parts once encoded. `encoding`:
+  `auto` (default), `gsm7` or `unicode`. `auto` switches to Unicode when it sees
+  characters such as `ê`, `ç` or emoji, which shrinks parts from 153 to 67 characters.
 
----
+`201 Created`:
 
-## 7. Error mapping (1s2u → our API)
+```json
+{
+  "id": "cm2…",
+  "status": "sent",
+  "sender": "MYSHOP",
+  "encoding": "gsm7",
+  "parts": 1,
+  "recipients": 2,
+  "creditsCharged": 2,
+  "creditsRefunded": 0,
+  "createdAt": "2026-10-16T12:00:00.000Z",
+  "batches": [{ "recipients": ["237670000000", "237650000000"], "status": "submitted" }],
+  "balance": 498
+}
+```
 
-| 1s2u code | Meaning | Our customer-facing code |
+- `status` is `sent`, or `partial` when some batches failed (those credits are
+  refunded, and each failed batch carries `error: { code, retryable }`).
+- If every batch fails, the response is an error (`503` or `422`) with the same payload
+  under `error.details`, and all credits are refunded.
+
+### `GET /balance`
+
+```json
+{ "credits": 498, "accountStatus": "active", "sender": { "value": "MYSHOP", "status": "approved" } }
+```
+
+### `GET /messages/{id}`
+
+Returns the same shape as a send response, without `balance`. Customers can only see
+their own messages.
+
+### Errors
+
+```json
+{ "error": { "code": "INSUFFICIENT_CREDIT", "message": "Not enough credit.", "details": { "required": 6 } } }
+```
+
+| HTTP | Code | When |
 |---|---|---|
-| `0000` | Service down | `UPSTREAM_UNAVAILABLE` (retryable) |
-| `000` | Missing required param | `BAD_REQUEST` (shouldn't reach here if our Zod schema is correct — log as a bug if it does) |
-| `00` | Invalid 1s2u credentials / trial expired | `UPSTREAM_AUTH_ERROR` — **our** fault, never show raw to customer, alert ourselves |
-| `0020` | Insufficient 1s2u account credit | `UPSTREAM_AUTH_ERROR` equivalent — alert ops immediately, this means *we* are low on prepaid credit with 1s2u, independent of any customer's wallet |
-| `0030` | Invalid sender name | `SENDER_ID_REJECTED` — shouldn't happen post-approval; flag the SID for re-review |
-| `0041` | Invalid mobile number | `INVALID_RECIPIENT` |
-| `0042` | Network not supported | `NETWORK_NOT_SUPPORTED` |
-| `0050` | Invalid message text | `INVALID_MESSAGE` |
-| `0051` | Invalid message type | internal bug — alert, don't surface |
-| `0060` | Invalid submission limit | internal bug (we should never send >30 recipients upstream) — alert, don't surface |
-
-`0020` and `00` are the two codes that mean **we** (the reseller) are about to go
-down for every customer — these should page/alert ops, not just log.
+| 401 | `UNAUTHORIZED` | missing, unknown or revoked key |
+| 403 | `ACCOUNT_INACTIVE` | account pending, suspended or disabled |
+| 403 | `SENDER_ID_BLOCKED` / `SENDER_ID_NOT_APPROVED` | SID not usable |
+| 400 | `BAD_REQUEST` | invalid JSON or body |
+| 402 | `INSUFFICIENT_CREDIT` | not enough credit; nothing sent |
+| 422 | `INVALID_RECIPIENT` | bad number(s), listed in `details.invalid` |
+| 422 | `UNSUPPORTED_DESTINATION` | no rate for these numbers, listed in `details.numbers` |
+| 422 | `MESSAGE_TOO_LONG` | over 5 parts |
+| 422 | `NETWORK_NOT_SUPPORTED` / `INVALID_MESSAGE` / `SENDER_ID_REJECTED` | refused by the operator side |
+| 429 | `RATE_LIMITED` | more than 5 requests/s on one key |
+| 503 | `UPSTREAM_UNAVAILABLE` | temporary; safe to retry later |
 
 ---
 
-## 8. Explicitly out of scope for v1 / open questions
+## 8. 1s2u error mapping
 
-- **Self-serve customer portal with login.** v1 assumes admin manages accounts, SIDs,
-  and manual credit top-ups through the existing admin dashboard (same auth as today
-  — `next-auth` Credentials, `Role.ADMIN`). A customer-facing portal (so customers can
-  self top-up, see usage, rotate their own keys) is a v2 addition, and would need its
-  own auth story since `SmsAccount` contacts aren't `User` rows today.
-- **Payment processor.** No Stripe/CinetPay/mobile-money integration exists in this
-  codebase (`package.json` has none). v1 top-ups are manual: admin records a
-  `SmsCreditTransaction(TOPUP)` after confirming payment out-of-band (bank transfer /
-  mobile money), same "known shortcut" posture as the email-sending stub in
-  `lib/notifications/devis.ts`. Flag this the same way in `README.md`'s "Known
-  shortcuts" section once built.
-- **Delivery receipts (DLR).** Not documented on the reference page — confirm with
-  1s2u whether a callback/webhook or a status-poll endpoint exists before promising
-  delivery confirmation to customers; `SmsMessage.status` in v1 only reflects
-  *submission* success/failure, not handset delivery.
-- **Real 1s2u pricing.** See §2.5 — the whole pricing table needs the actual contract
-  rate before customers can be sold the plan in §2.3 as final numbers.
-- **Outbound rate limiting across customers.** 1s2u's 30 req/s cap is shared by all
-  our customers combined. v1 needs a simple global token-bucket in `gateway.ts`
-  (e.g. capped at ~25 req/s to leave headroom) before any per-customer fairness
-  logic; per-customer caps are a v2 refinement once real traffic patterns are known.
+| 1s2u | Meaning | Customer sees | Ops alert |
+|---|---|---|---|
+| `0000` | service down | `UPSTREAM_UNAVAILABLE` (retried once automatically) | no |
+| `000` | missing parameter | `INTERNAL_ERROR` | yes (our bug) |
+| `00` | **our** credentials invalid / trial expired | `UPSTREAM_UNAVAILABLE` | **yes, the service is down for every customer** |
+| `0020` | **our** 1s2u balance is empty | `UPSTREAM_UNAVAILABLE` | **yes, top up 1s2u now** |
+| `0030` | invalid sender name | `SENDER_ID_REJECTED` | yes; the SID goes back to review |
+| `0041` | invalid number | `INVALID_RECIPIENT` | no |
+| `0042` | network not supported | `NETWORK_NOT_SUPPORTED` | no |
+| `0050` | invalid text | `INVALID_MESSAGE` | no |
+| `0051`, `0060` | bad type / too many numbers | `INTERNAL_ERROR` | yes (our bug) |
+| HTTP 429 | 1s2u rate limit | `UPSTREAM_UNAVAILABLE` (retried once) | yes |
+| timeout | network | `UPSTREAM_UNAVAILABLE` (not retried, since it may have been delivered) | no |
+
+Ops alerts are currently `console.error("[sms-alert] …")` in the PM2 logs
+(`pm2 logs | grep sms-alert`). They need wiring to a real channel; see §9.
 
 ---
 
-## 9. Suggested build order
+## 9. Before launch
 
-1. Prisma migration: `SmsAccount`, `SmsAccountStatusEvent`, `SmsSenderId`,
-   `SmsSenderIdStatusEvent`, `SmsApiKey`, `SmsCreditTransaction`, `SmsMessage`,
-   `SmsRateCard`.
-2. `lib/sms/client.ts` + `lib/sms/segmentation.ts` + `lib/sms/errors.ts` — pure
-   upstream integration, testable without any account/billing logic yet.
-3. `lib/sms/auth.ts` + `app/api/sms/v1/send/route.ts` — end-to-end send path with a
-   manually-seeded account/key/SID (no admin UI yet).
-4. `lib/actions/sms-*.ts` + admin pages (§6) — so staff can manage accounts/SIDs/keys
-   without touching the DB directly.
-5. `lib/sms/pricing.ts` + credit debit/refund wiring into the send path.
-6. Rate limiting + error-code alerting (§7/§8) before accepting real customer traffic.
+1. **Apply the migration and seed.** On deploy, `deploy.sh` runs
+   `prisma migrate deploy`; run `npm run db:seed` once to create the rate row and
+   packages. The migration was generated with `prisma migrate diff` (the local DB login
+   was rejected), so run `npx prisma migrate dev` against a dev database first.
+2. **Set `SMS_PROVIDER_USERNAME` / `SMS_PROVIDER_PASSWORD`** on the server.
+3. **Test against live 1s2u** with a test account, our own SID and our own number:
+   - a plain message (`mt=0`);
+   - a message with `é`/`è`/`à`, which counts as GSM-7. Confirm 1s2u renders the
+     accents correctly with `mt=0`; if not, treat accented text as Unicode.
+   - a message with `ê`/`ç`, which is sent as Unicode hex;
+   - a 2-part message;
+   - 31+ recipients, to check batching;
+   - a wrong password, to confirm the response format and that a `00` alert fires.
+4. **Negotiate the Cameroon rate** (§2.4), then update prices on `/admin/sms/pricing`.
+5. **Wire ops alerts** (`lib/notifications/sms.ts`) to email/WhatsApp, at least for
+   `00` and `0020`.
+6. **Watch our 1s2u balance.** Customer credit is our liability; 1s2u credit is what
+   actually sends.
+
+### Known v1 limits
+
+- **No delivery receipts.** Ask 1s2u whether a DLR webhook or status endpoint exists.
+- **Manual payments.** There's no payment processor; admins record top-ups.
+- **No customer portal.** Admins manage SIDs and keys. A self-serve portal (with its own
+  login, usage stats and key rotation) is v2, and so is a public page documenting §7.
+- **Single-process rate limits.** They're correct with PM2 `instances: 1`; scaling out
+  needs Redis or Postgres.
+- **Credits don't expire.**
+- **Crash recovery.** If the process dies between the debit and the 1s2u call, a message
+  stays `PENDING` with credits debited. Find these with
+  `SELECT * FROM "SmsMessage" WHERE status = 'PENDING' AND "createdAt" < now() - interval '5 minutes'`
+  and refund them with a manual adjustment.

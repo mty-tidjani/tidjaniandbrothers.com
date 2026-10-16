@@ -46,7 +46,9 @@ Marketing site + admin back-office for Tidjani And Brothers, an Odoo ERP consult
 
 - `app/(site)` — public marketing pages (Home, Services, Portfolio, Blog, About, Contact)
 - `app/(booking)` — the standalone 2-step "réserver un audit" flow and its confirmation screen
-- `app/admin` — authenticated back-office (leads, blog, portfolio, services & pricing, team, settings)
+- `app/admin` — authenticated back-office (leads, blog, portfolio, services & pricing, SMS, team, settings)
+- `app/api/sms/v1` — public, API-key-authenticated SMS API we resell on top of 1s2u (see `SMS.md`)
+- `lib/sms` — SMS gateway core: 1s2u client, auth, pricing, credits ledger, rate limiting
 - `components/ui` — shared primitives used by both the public site and admin
 - `components/site`, `components/admin`, `components/forms` — feature components
 - `lib/validation` — Zod schemas (single source of truth for client forms and server actions/routes)
@@ -59,6 +61,8 @@ Marketing site + admin back-office for Tidjani And Brothers, an Odoo ERP consult
 - **Password reset & team invite emails are not actually sent.** No email provider is configured; the reset/invite link is logged server-side (`console.info`) instead. The token flow exists in the database, but there's no page yet to complete a reset from that link, since it's unreachable without email delivery.
 - **File uploads are placeholder text fields**, not a real upload pipeline. Blog cover images and case study images accept a path string; wiring an actual upload (to `public/uploads` locally, or object storage in production) is still open. `public/uploads` won't persist on ephemeral/serverless hosts like Vercel — needs external storage before a real deploy.
 - **Language toggle is visual only.** Content is French-only for now (matches the original brief's scope); the EN side of the toggle is a disabled label, not a working locale switch.
+- **SMS credit top-ups are manual.** There's no payment processor: an admin records each payment (mobile money / bank transfer) from `/admin/sms/[id]`, which credits the account. SMS ops alerts (1s2u credentials invalid, our 1s2u balance empty) are logged with `console.error("[sms-alert] ...")` rather than sent anywhere — see `lib/notifications/sms.ts`.
+- **SMS rate limits are in-process**, which is only correct while PM2 runs a single instance (`process.json`). Scaling out needs a shared store.
 - **Portfolio ships with 1 real case study + 2 unpublished TODO placeholders** rather than fabricated client data, per the brief.
 
 ## Scripts
